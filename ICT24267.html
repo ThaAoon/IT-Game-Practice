@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICT24267 - Cloud Computing Challenge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --accent-color: #38bdf8;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-secondary: #94a3b8;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg-color);
+            color: #f8fafc;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #1e293b, #0f172a);
+        }
+
+        .breadcrumb-item a { color: var(--accent-color); text-decoration: none; }
+        .breadcrumb-item.active { color: var(--text-secondary); }
+
+        .banner {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(30, 58, 138, 0.2) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+        }
+
+        .course-title { font-family: 'Orbitron', sans-serif; letter-spacing: 1px; color: var(--accent-color); }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+
+        .card-header {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border-bottom: 1px solid var(--glass-border) !important;
+            border-radius: 20px 20px 0 0 !important;
+        }
+
+        .list-group-item {
+            background: transparent !important;
+            border-color: var(--glass-border) !important;
+            color: #f8fafc !important;
+            transition: all 0.3s;
+        }
+
+        .list-group-item:hover:not(.opacity-50) { background: rgba(255, 255, 255, 0.05) !important; transform: scale(1.01); }
+
+        .btn-play {
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-play:hover:not(:disabled) {
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary-custom { background: rgba(255, 255, 255, 0.1); border: none; color: var(--text-secondary); border-radius: 12px; }
+
+        .rules-box { border-left: 4px solid #fbbf24 !important; background: rgba(251, 191, 36, 0.05) !important; }
+    </style>
+</head>
+<body>
+
+    <div class="container py-4">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html"><i class="bi bi-house-door-fill me-1"></i>หน้าแรก</a></li>
+                <li class="breadcrumb-item active" aria-current="page">ICT24267</li>
+            </ol>
+        </nav>
+
+        <div class="banner p-5 mb-5 shadow-lg">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4 class="text-info fw-bold mb-2">COURSE DASHBOARD</h4>
+                    <h1 class="display-5 fw-bold course-title">ICT24267</h1>
+                    <h2 class="h4 mb-3">การประมวลผลคลาวด์ (Cloud Computing)</h2>
+                    <p class="mb-0 text-secondary"><i class="bi bi-person-badge me-2"></i>อาจารย์อำนาจ คงเจริญถิ่น | มหาวิทยาลัยศรีปทุม</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                    <div class="d-inline-block text-center p-3 glass-card">
+                        <h3 class="mb-0 fw-bold text-info">13</h3>
+                        <small class="text-secondary">บทเรียนทั้งหมด</small>
+                    </div>
+                    <p></p>
+                    <div >
+                        <button class="btn btn-danger" onclick="startFinalExam()">
+                            <i class="bi bi-shield-lock-fill"></i> เข้าสู่โหมดสอบ Final (40 ข้อ)
+                        </button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card glass-card shadow-sm border-0 mb-4">
+                    <div class="card-header py-3">
+                        <h5 class="mb-0 fw-bold text-light"><i class="bi bi-controller me-2 text-info"></i>Mission Select: เลือกบทเรียน</h5>
+                    </div>
+                    <div class="list-group list-group-flush" id="chapter-list">
+                        <!-- รายการบทเรียนจะถูกสร้างโดย JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card glass-card border-0 mb-4 rules-box">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold text-warning"><i class="bi bi-shield-exclamation me-2"></i>Game Rules</h5>
+                        <ul class="mt-3 list-unstyled">
+                            <li class="mb-3 d-flex align-items-start text-light">
+                                <i class="bi bi-stopwatch text-info me-3 mt-1"></i>
+                                <span><strong>Time Limit:</strong> 10 วินาทีต่อข้อ</span>
+                            </li>
+                            <li class="mb-3 d-flex align-items-start text-light">
+                                <i class="bi bi-shuffle text-info me-3 mt-1"></i>
+                                <span><strong>Randomized:</strong> สุ่มคำถามและสลับตัวเลือกทุกรอบ</span>
+                            </li>
+                            <li class="mb-3 d-flex align-items-start text-light">
+                                <i class="bi bi-x-circle text-danger me-3 mt-1"></i>
+                                <span><strong>Penalty:</strong> หมดเวลาถือว่า Game Over ในข้อนั้น</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card glass-card border-0 text-center p-4">
+                    <h6 class="text-secondary mb-3">Your Progress</h6>
+                    <div class="progress bg-dark" style="height: 10px; border-radius: 10px;">
+                        <div class="progress-bar bg-info" role="progressbar" id="progress-bar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <small class="mt-2 text-info" id="progress-text">0 / 13 Chapters Completed</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ชื่อบทเรียน
+        const chapterNames = {
+            1: "Introduction to Cloud Computing",
+            2: "OSI 7 Layers & IaaS",
+            3: "PaaS & SaaS",
+            4: "Public Cloud Providers",
+            5: "Private & Hybrid Cloud",
+            6: "AI as a Service (AIaaS)",
+            7: "Cloud Storage & Backup",
+            8: "Cloud Security & Privacy",
+            9: "SLA & Compliance",
+            10: "Economics of Cloud",
+            11: "Cloud Careers & Future Trends",
+            12: "Microservices & Containers",
+            13: "Project Workshop: Student Record"
+        };
+
+        // ฐานข้อมูลคำถาม
+        const quizData = {
+            chapter1: [
+                { q: "ข้อใดอธิบายความหมายของ Cloud Computing ได้ถูกต้องที่สุด?", options: ["การซื้อเซิร์ฟเวอร์ราคาแพงมาติดตั้งในองค์กร", "การให้บริการทรัพยากรคอมพิวเตอร์ผ่านอินเทอร์เน็ตแบบจ่ายตามจริง", "การเก็บข้อมูลไว้ในแฟลชไดร์ฟเพื่อพกพา", "การสร้างโรงไฟฟ้าเพื่อใช้เองภายในบ้าน"], answer: 1 },
+                { q: "คุณลักษณะ 'On-demand Self-service' ตามนิยามของ NIST หมายถึงอะไร?", options: ["ผู้ใช้ต้องติดต่อเจ้าหน้าที่ทุกครั้งที่เพิ่มเครื่อง", "ระบบต้องเชื่อมต่อผ่านสาย Lan เท่านั้น", "ผู้ใช้จัดการทรัพยากรได้ด้วยตัวเองผ่านระบบอัตโนมัติ", "การวัดปริมาณการใช้งานเพื่อคิดค่าบริการ"], answer: 2 },
+                { q: "หากบริษัทต้องการเช่าเซิร์ฟเวอร์เปล่าเพื่อลง OS เอง ควรเลือกโมเดลใด?", options: ["SaaS", "PaaS", "IaaS", "FaaS"], answer: 2 },
+                { q: "Google Workspace และ Microsoft 365 จัดอยู่ใน Service Model ประเภทใด?", options: ["IaaS", "PaaS", "SaaS", "Private Cloud"], answer: 2 },
+                { q: "ข้อใดคือลักษณะของ Public Cloud?", options: ["ใช้งานภายในองค์กรเดียวเท่านั้น", "ผสมผสานระบบภายในและภายนอก", "ให้บริการผ่านอินเทอร์เน็ตสาธารณะและแชร์ทรัพยากร", "ต้องลงทุนสูงในการสร้าง Data Center เอง"], answer: 2 },
+                { q: "'Rapid Elasticity' ช่วยแก้ปัญหาในสถานการณ์ใดได้ดีที่สุด?", options: ["เมื่อต้องการประหยัดค่าไฟฟ้า", "เมื่อเว็บไซต์มีผู้เข้าชมเพิ่มขึ้นรวดเร็วช่วงโปรโมชั่น", "เมื่อต้องการย้ายข้อมูลระหว่างผู้ให้บริการ", "เมื่ออินเทอร์เน็ตขัดข้อง"], answer: 1 },
+                { q: "ความท้าทายเรื่อง 'Vendor Lock-in' หมายถึงอะไร?", options: ["อินเทอร์เน็ตความเร็วไม่เพียงพอ", "ความยากลำบากในการย้ายระบบไปยังผู้ให้บริการรายอื่น", "การถูกแฮกข้อมูล", "ผู้ให้บริการไม่ยอมคิดค่าบริการตามจริง"], answer: 1 },
+                { q: "เทคโนโลยีใดเน้น 'ประมวลผลใกล้แหล่งข้อมูล' เพื่อลดความหน่วง (Latency)?", options: ["Serverless Computing", "Multi-cloud", "Edge Computing", "Resource Pooling"], answer: 2 },
+                { q: "ข้อดีทางด้านการเงินเมื่อเปลี่ยนมาใช้ Cloud คืออะไร?", options: ["เปลี่ยนจาก OpEx เป็น CapEx", "เปลี่ยนจาก CapEx เป็น OpEx", "ต้องใช้เงินก้อนโตลงทุนต้นปี", "ไม่ต้องจ่ายค่าบริการรายเดือน"], answer: 1 },
+                { q: "คุณลักษณะ 'Resource Pooling' มีความสำคัญอย่างไร?", options: ["ช่วยให้ผู้ใช้เข้าถึงระบบได้ทุกอุปกรณ์", "ช่วยให้ผู้ให้บริการจัดสรรทรัพยากรให้ผู้ใช้หลายรายอย่างคุ้มค่า", "ช่วยป้องกันข้อมูลรั่วไหล", "ช่วยให้ระบบทำงานได้แม้ไม่มีอินเทอร์เน็ต"], answer: 1 }
+            ],
+            chapter2: [
+                { q: "OSI Model ชั้นใดที่ทำหน้าที่กำหนดมาตรฐานของสัญญาณไฟฟ้าและสาย LAN?", options: ["Data Link Layer", "Physical Layer", "Network Layer", "Transport Layer"], answer: 1 },
+                { q: "Layer ใดใน OSI Model ที่มีหน้าที่เลือกเส้นทาง (Routing) และใช้ IP Address?", options: ["Transport Layer", "Data Link Layer", "Network Layer", "Session Layer"], answer: 2 },
+                { q: "ในโมเดล IaaS ผู้ให้บริการคลาวด์ (Provider) จะรับผิดชอบส่วนใด?", options: ["Operating System", "Application Data", "Virtualization & Networking", "Middleware"], answer: 2 },
+                { q: "หากคุณเช่าบริการ EC2 จาก AWS เพื่อมาลง Linux เอง จัดเป็นการบริการแบบใด?", options: ["IaaS", "PaaS", "SaaS", "Serverless"], answer: 0 },
+                { q: "เทคโนโลยีใดที่ทำหน้าที่เป็นตัวกลางในการแบ่งทรัพยากรฮาร์ดแวร์ให้ VM?", options: ["Kernel", "Hypervisor", "Container", "Firewall"], answer: 1 },
+                { q: "ข้อใดคือความแตกต่างหลักระหว่าง VM และ Container?", options: ["VM มี OS ของตัวเอง แต่ Container ใช้ OS ร่วมกับ Host", "Container ปลอดภัยกว่า VM มาก", "VM ทำงานได้เร็วกว่า Container", "Container ใช้พื้นที่มากกว่า VM"], answer: 0 },
+                { q: "Hypervisor ประเภท Type 1 (Bare-metal) ทำงานอย่างไร?", options: ["ติดตั้งทับบน Windows อีกที", "ติดตั้งลงบนฮาร์ดแวร์โดยตรง", "ทำงานผ่าน Browser", "เป็นซอฟต์แวร์ประยุกต์ทั่วไป"], answer: 1 },
+                { q: "Storage Virtualization เช่น RAID มีประโยชน์หลักอย่างไร?", options: ["ช่วยให้เน็ตเร็วขึ้น", "รวมพื้นที่จัดเก็บหลายก้อนให้เป็นก้อนเดียวและสำรองข้อมูล", "ช่วยให้รันโปรแกรมได้หลายตัว", "ป้องกันไวรัส"], answer: 1 },
+                { q: "ความหน่วง (Latency) มักเกิดขึ้นที่ Layer ใดหากสายสัญญาณมีคุณภาพต่ำ?", options: ["Application Layer", "Presentation Layer", "Physical Layer", "Session Layer"], answer: 2 },
+                { q: "ข้อดีที่สุดของ Virtualization คืออะไร?", options: ["ทำให้ฮาร์ดแวร์ราคาถูกลง", "เพิ่มประสิทธิภาพการใช้ทรัพยากรที่มีอยู่ให้เต็มที่", "ไม่ต้องใช้อินเทอร์เน็ต", "แทนที่โปรแกรม Antivirus"], answer: 1 }
+            ],
+            chapter3: [
+                { q: "โมเดลการให้บริการใดที่นักพัฒนาสามารถโฟกัสที่การเขียน Code ได้โดยไม่ต้องกังวลเรื่อง OS?", options: ["IaaS", "PaaS", "SaaS", "On-site"], answer: 1 },
+                { q: "Google App Engine และ Heroku จัดเป็นการให้บริการแบบใด?", options: ["SaaS", "IaaS", "PaaS", "Hardware"], answer: 2 },
+                { q: "ในรูปแบบ PaaS สิ่งใดที่ผู้ใช้งานยังต้องเป็นคนจัดการเอง?", options: ["Virtualization", "Runtime", "Networking", "Applications & Data"], answer: 3 },
+                { q: "ข้อใดคือคำจำกัดความของ Software as a Service (SaaS) ที่ถูกต้องที่สุด?", options: ["การเช่าใช้ซอฟต์แวร์ผ่านอินเทอร์เน็ต", "การซื้อขาดซอฟต์แวร์มาลงในเครื่อง", "การสร้างแอปพลิเคชันด้วยตัวเอง", "การเช่าเนื้อที่เก็บข้อมูลเพียงอย่างเดียว"], answer: 0 },
+                { q: "ข้อใดจัดเป็นบริการประเภท SaaS ทั้งหมด?", options: ["EC2, S3", "Gmail, Facebook, Office 365", "Windows, Linux", "SQL Server, MySQL"], answer: 1 },
+                { q: "ข้อใดคือข้อดีเด่นชัดของ SaaS สำหรับผู้ใช้งานทั่วไป?", options: ["ต้องดูแลเซิร์ฟเวอร์เอง", "เข้าถึงได้ทุกที่ทุกเวลาผ่านอินเทอร์เน็ต", "ต้องเสียค่าซ่อมบำรุงซอฟต์แวร์เอง", "ขยายฮาร์ดแวร์ได้ยาก"], answer: 1 },
+                { q: "PaaS ช่วยลดขั้นตอนใดในวงจรการพัฒนาซอฟต์แวร์?", options: ["การเขียนโค้ด", "การออกแบบ UI", "การตั้งค่า Server และ Runtime Environment", "การตลาด"], answer: 2 },
+                { q: "หากต้องการใช้โปรแกรมบัญชีออนไลน์โดยไม่อยากติดตั้งลงเครื่อง ควรเลือกบริการโมเดลใด?", options: ["IaaS", "PaaS", "SaaS", "CaaS"], answer: 2 },
+                { q: "ความกังวลหลักของการใช้ SaaS คือข้อใด?", options: ["การอัปเดตเวอร์ชันซอฟต์แวร์", "ความปลอดภัยของข้อมูลบนคลาวด์", "การใช้พื้นที่บนฮาร์ดดิสก์เครื่องตัวเอง", "การติดตั้งโปรแกรมลงในคอมพิวเตอร์"], answer: 1 },
+                { q: "ในโมเดล PaaS ใครเป็นผู้ดูแล Middleware และ OS?", options: ["ผู้ใช้บริการ (User)", "นักพัฒนา (Developer)", "ผู้ให้บริการคลาวด์ (Cloud Provider)", "เจ้าหน้าที่ไอทีของบริษัท"], answer: 2 }
+            ],
+            chapter4: [
+                { q: "ผู้ให้บริการ Public Cloud รายใดที่มีส่วนแบ่งการตลาดสูงที่สุดในโลกในปัจจุบัน?", options: ["Microsoft Azure", "Google Cloud", "AWS (Amazon Web Services)", "Huawei Cloud"], answer: 2 },
+                { q: "บริการ Amazon EC2 จัดอยู่ในโมเดลการให้บริการ Cloud ประเภทใด?", options: ["IaaS", "PaaS", "SaaS", "Serverless"], answer: 0 },
+                { q: "หากต้องการเก็บไฟล์รูปภาพหรือวิดีโอจำนวนมากบน AWS ควรเลือกใช้บริการใด?", options: ["Amazon EBS", "Amazon S3", "Amazon EC2", "AWS Lambda"], answer: 1 },
+                { q: "บริการ Cloud 'Serverless' ของ AWS ที่ทำงานเมื่อมีการเรียกใช้เท่านั้นคืออะไร?", options: ["Amazon LightSail", "AWS Lambda", "Amazon ECS", "AWS Batch"], answer: 1 },
+                { q: "จุดเด่นของ Microsoft Azure ที่เหนือกว่าคู่แข่งในกลุ่มองค์กรคืออะไร?", options: ["ราคาถูกที่สุด", "การเชื่อมต่อกับ Active Directory และ Microsoft 365", "มีดาต้าเซ็นเตอร์เฉพาะในเอเชีย", "เน้นเฉพาะด้าน Machine Learning"], answer: 1 },
+                { q: "ข้อใดคือข้อดีของการเลือกใช้ผู้ให้บริการ Cloud ภายในประเทศไทย?", options: ["มีบริการหลากหลายกว่า Global", "ความหน่วง (Latency) ต่ำกว่าเพราะเซิร์ฟเวอร์อยู่ในไทย", "ไม่ต้องใช้อินเทอร์เน็ต", "ราคาถูกกว่า AWS เสมอ"], answer: 1 },
+                { q: "DigitalOcean มีจุดเด่นที่แตกต่างจากผู้ให้บริการรายใหญ่อย่าง AWS อย่างไร?", options: ["เน้นความง่าย (Simplicity) และราคาที่คาดเดาง่าย", "มี AI ที่ฉลาดที่สุด", "ไม่มีค่าบริการรายเดือน", "เน้นบริการเฉพาะด้านการธนาคาร"], answer: 0 },
+                { q: "Amazon EBS (Elastic Block Store) เปรียบได้กับอุปกรณ์ใดในคอมพิวเตอร์ทั่วไป?", options: ["CPU", "RAM", "Hard Disk (Virtual Drive)", "Network Card"], answer: 2 },
+                { q: "หากองค์กรต้องการทำ Data Analytics และ Machine Learning เป็นหลัก มักจะนึกถึงผู้ให้บริการรายใด?", options: ["Oracle Cloud", "IBM Cloud", "Google Cloud Platform", "Alibaba Cloud"], answer: 2 },
+                { q: "เหตุผลสำคัญที่รัฐบาลบางประเทศกำหนดให้ใช้ Cloud ในประเทศคือเรื่องใด?", options: ["ความสวยงามของหน้าจอการใช้งาน", "ความเร็วในการประมวลผล", "อธิปไตยของข้อมูล (Data Sovereignty)", "ความง่ายในการจ่ายเงิน"], answer: 2 }
+            ],
+            chapter5: [
+                { q: "Private Cloud ต่างจาก Public Cloud ในด้านใดชัดเจนที่สุด?", options: ["ราคาถูกกว่า", "ใช้เฉพาะองค์กรหรือหน่วยงานเดียว", "เข้าถึงผ่านเน็ตสาธารณะเท่านั้น", "ไม่ต้องดูแลฮาร์ดแวร์"], answer: 1 },
+                { q: "หน่วยงานประเภทใดที่เหมาะสมที่สุดในการเลือกใช้ Private Cloud?", options: ["ร้านค้าออนไลน์ขนาดเล็ก", "บล็อกเกอร์ส่วนตัว", "ธนาคารหรือหน่วยงานความมั่นคง", "นักศึกษาทั่วไป"], answer: 2 },
+                { q: "Hybrid Cloud หมายถึงการรวมกันของระบบใด?", options: ["SaaS และ PaaS", "Private Cloud และ Public Cloud", "Internet และ Intranet", "Hardware และ Software"], answer: 1 },
+                { q: "เทคโนโลยีใดที่ช่วยเชื่อมต่อ Private Cloud กับ Public Cloud เข้าด้วยกัน?", options: ["VPN หรือ Direct Connect", "Flash Drive", "Bluetooth", "สาย LAN ธรรมดา"], answer: 0 },
+                { q: "Cloud Bursting ในระบบ Hybrid Cloud คืออะไร?", options: ["การที่ระบบคลาวด์ล่ม", "การขยายทรัพยากรไปใช้ Public Cloud ชั่วคราวเมื่อ Private Cloud เต็ม", "การลบข้อมูลทั้งหมดทิ้ง", "การเปลี่ยนจาก Private เป็น Public ถาวร"], answer: 1 },
+                { q: "บริการใดจาก AWS ที่ช่วยให้รันบริการ EC2 หรือ S3 ใน Data Center ขององค์กรเองได้?", options: ["AWS Lambda", "AWS Outposts", "Amazon S3", "AWS Direct Connect"], answer: 1 },
+                { q: "ข้อเสียหลักของ Private Cloud เมื่อเทียบกับ Public Cloud คืออะไร?", options: ["ความปลอดภัยต่ำ", "ต้องลงทุนสูงและดูแลระบบเอง", "ปรับแต่งระบบไม่ได้", "แชร์ทรัพยากรกับคนอื่น"], answer: 1 },
+                { q: "Azure Stack เป็นบริการที่เน้นสนับสนุนโมเดลคลาวด์แบบใด?", options: ["Public Cloud เท่านั้น", "Hybrid Cloud", "SaaS เท่านั้น", "Community Cloud"], answer: 1 },
+                { q: "Google Anthos ใช้เทคโนโลยีใดเป็นพื้นฐานในการจัดการแอปพลิเคชันข้ามคลาวด์?", options: ["VirtualBox", "Kubernetes", "VMware", "Microsoft SQL"], answer: 1 },
+                { q: "เหตุผลที่องค์กรใช้ Hybrid Cloud แทนที่จะใช้ Public Cloud ทั้งหมดคืออะไร?", options: ["เพื่อความประหยัดที่สุด", "เพื่อรักษาความปลอดภัยข้อมูลสำคัญในขณะที่ยังต้องการความยืดหยุ่น", "เพราะ Public Cloud ไม่มีพื้นที่พอ", "เพราะไม่ต้องการใช้อินเทอร์เน็ต"], answer: 1 }
+            ],
+            chapter6: [
+    { q: "AI as a Service (AlaaS) มีประโยชน์หลักอย่างไร?", options: ["ต้องติดตั้งฮาร์ดแวร์ราคาแพง", "เข้าถึงเทคโนโลยี AI ได้ง่ายโดยไม่ต้องมีความรู้เชิงลึก", "ใช้ได้เฉพาะตอนไม่มีอินเทอร์เน็ต", "ทำให้คอมพิวเตอร์ทำงานช้าลง"], answer: 1 },
+    { q: "งานประเภทใดที่เหมาะสมกับการใช้ GPU Cloud มากที่สุด?", options: ["การพิมพ์เอกสาร Word", "การส่งอีเมล", "การฝึกฝนโมเดล Deep Learning", "การเล่นอินเทอร์เน็ตทั่วไป"], answer: 2 },
+    { q: "ทำไม GPU ถึงประมวลผล AI ได้เร็วกว่า CPU?", options: ["มีขนาดใหญ่กว่า", "ประมวลผลแบบขนาน (Parallel Processing) ได้ดีกว่า", "ราคาถูกกว่ามาก", "ใช้พลังงานน้อยกว่า"], answer: 1 },
+    { q: "บริการ AI Cloud ในปัจจุบันมักครอบคลุมเรื่องใดบ้าง?", options: ["การวิเคราะห์ภาพและภาษาธรรมชาติ", "การซ่อมแซมหน้าจอคอมพิวเตอร์", "การผลิตชิ้นส่วนฮาร์ดแวร์", "การเพิ่มความเร็วอินเทอร์เน็ต"], answer: 0 },
+    { q: "ข้อเสียของการใช้ AI Cloud คือข้อใด?", options: ["ใช้งานง่ายเกินไป", "ประหยัดค่าใช้จ่าย", "อาจมีข้อจำกัดเรื่องความเป็นส่วนตัวของข้อมูล", "เข้าถึงได้ทุกที่"], answer: 2 },
+    { q: "การเรนเดอร์วิดีโอ (Video Rendering) ได้รับประโยชน์จาก GPU ในด้านใด?", options: ["ทำให้ไฟล์เล็กลง", "ประมวลผลภาพได้รวดเร็วและสมจริง", "ทำให้ไม่ต้องใช้อินเทอร์เน็ต", "เพิ่มความจุของ Hard Disk"], answer: 1 },
+    { q: "การประมวลผลแบบขนาน (Parallel Processing) หมายถึงอะไร?", options: ["การทำงานทีละขั้นตอนอย่างช้าๆ", "การประมวลผลข้อมูลหลายชุดพร้อมกัน", "การทำงานเฉพาะตอนกลางคืน", "การใช้ CPU เพียงตัวเดียว"], answer: 1 },
+    { q: "AI Cloud ช่วยองค์กรในด้านความคุ้มค่าอย่างไร?", options: ["ไม่ต้องซื้อซูเปอร์คอมพิวเตอร์เอง จ่ายตามที่ใช้จริง", "ทำให้พนักงานไม่ต้องทำงาน", "เพิ่มราคาขายสินค้า", "ลดจำนวนคู่แข่ง"], answer: 0 },
+    { q: "Deep Learning เกี่ยวข้องกับการคำนวณทางคณิตศาสตร์ประเภทใดเป็นหลัก?", options: ["การบวกลบเลขฐานสอง", "การคูณเมทริกซ์จำนวนมาก", "การถอดสแควรูท", "การหาค่าสถิติทั่วไป"], answer: 1 },
+    { q: "AlaaS ย่อมาจากคำว่าอะไร?", options: ["AI as a System", "AI as a Service", "AI and a Software", "Apple in a Store"], answer: 1 }
+],
+chapter7: [
+    { q: "Cloud Storage คือการเก็บข้อมูลไว้ที่ใด?", options: ["Hard Drive ในเครื่อง", "Flash Drive", "เซิร์ฟเวอร์ของผู้ให้บริการผ่านอินเทอร์เน็ต", "แผ่น CD"], answer: 2 },
+    { q: "ข้อใดคือคุณสมบัติ 'Scalability' ของ Cloud Storage?", options: ["การล็อกไฟล์ไม่ให้คนอื่นเห็น", "การเพิ่มหรือลดพื้นที่จัดเก็บได้ตามต้องการ", "การส่งไฟล์ผ่าน Bluetooth", "การเปลี่ยนสีโฟลเดอร์"], answer: 1 },
+    { q: "Google Drive และ iCloud จัดเป็น Cloud Storage ประเภทใด?", options: ["Public Cloud Storage", "Personal Cloud Storage", "Private Cloud Storage", "Hybrid Cloud Storage"], answer: 1 },
+    { q: "ข้อใดคือข้อดีของการสำรองข้อมูล (Backup) บน Cloud?", options: ["ประหยัดไฟฟ้า", "ป้องกันข้อมูลสูญหายจากฮาร์ดแวร์พัง", "ทำให้ไฟล์หายไปเอง", "ไม่ต้องสมัครสมาชิก"], answer: 1 },
+    { q: "ความกังวลเรื่อง Data Breach ใน Cloud Storage เกี่ยวข้องกับเรื่องใด?", options: ["ความเร็วอินเทอร์เน็ต", "ความปลอดภัยของข้อมูลจากการถูกโจมตี", "ขนาดของไฟล์", "ชื่อของผู้ให้บริการ"], answer: 1 },
+    { q: "Latency ในการใช้งาน Cloud Storage มักเกิดจากสาเหตุใด?", options: ["ศูนย์ข้อมูลอยู่ไกลจากผู้ใช้", "หน้าจอคอมพิวเตอร์สว่างเกินไป", "การใช้เมาส์ไร้สาย", "ไฟล์มีสีสันมากเกินไป"], answer: 0 },
+    { q: "การเข้ารหัสข้อมูล (Encryption) มีไว้เพื่ออะไร?", options: ["ทำให้ไฟล์เล็กลง", "ป้องกันคนไม่หวังดีแอบอ่านข้อมูล", "เพิ่มความเร็วในการดาวน์โหลด", "เปลี่ยนนามสกุลไฟล์"], answer: 1 },
+    { q: "ข้อใดคือข้อเสียของการเก็บข้อมูลบน Cloud เมื่อเทียบกับ On-Premises?", options: ["เข้าถึงได้จากทุกที่", "ต้องพึ่งพาการเชื่อมต่ออินเทอร์เน็ต", "แชร์ข้อมูลได้ง่าย", "มีระบบสำรองข้อมูลอัตโนมัติ"], answer: 1 },
+    { q: "Multi-Factor Authentication (MFA) ช่วยเรื่องใด?", options: ["เพิ่มความจุไฟล์", "เพิ่มความปลอดภัยในการเข้าสู่ระบบ", "ทำให้เน็ตเร็วขึ้น", "ช่วยจัดระเบียบไฟล์"], answer: 1 },
+    { q: "หากต้องการเก็บข้อมูลสำคัญมากของบริษัทโดยไม่แชร์ทรัพยากรกับใคร ควรเลือกประเภทใด?", options: ["Public Cloud", "Personal Cloud", "Private Cloud Storage", "Free Cloud"], answer: 2 }
+],
+            chapter8: [
+    { q: "Cloud Security มีจุดมุ่งหมายหลักเพื่ออะไร?", options: ["เพิ่มความเร็วอินเทอร์เน็ต", "ปกป้องข้อมูลและระบบจากภัยคุกคาม", "ลดจำนวนผู้ใช้งานระบบ", "ทำให้ฮาร์ดแวร์ทำงานได้นานขึ้น"], answer: 1 },
+    { q: "การยืนยันตัวตนแบบ MFA มีประโยชน์อย่างไร?", options: ["ช่วยให้จำรหัสผ่านได้ง่ายขึ้น", "เพิ่มความปลอดภัยอีกชั้นนอกเหนือจากรหัสผ่าน", "ทำให้เข้าถึงข้อมูลได้เร็วขึ้น", "ลดค่าใช้จ่ายในการสมัครสมาชิก"], answer: 1 },
+    { q: "Shared Responsibility Model คืออะไร?", options: ["การที่ผู้ให้บริการดูแลความปลอดภัยทั้งหมด", "การแบ่งความรับผิดชอบระหว่างผู้ให้บริการและผู้ใช้", "การที่ผู้ใช้ไม่ต้องดูแลความปลอดภัยเลย", "การใช้รหัสผ่านร่วมกันหลายคน"], answer: 1 },
+    { q: "ระบบ IDS ทำหน้าที่อะไรใน Cloud Security?", options: ["สำรองข้อมูล", "ตรวจจับพฤติกรรมที่น่าสงสัยในเครือข่าย", "เข้ารหัสอีเมล", "เพิ่มพื้นที่จัดเก็บข้อมูล"], answer: 1 },
+    { q: "ข้อใดคือการป้องกันข้อมูลที่ต้นทางก่อนส่งขึ้น Cloud?", options: ["การซื้อประกันภัย", "การเข้ารหัสข้อมูล (Encryption)", "การเปลี่ยนชื่อไฟล์", "การใช้เมาส์ไร้สาย"], answer: 1 },
+    { q: "CASB คือเทคโนโลยีที่เน้นเรื่องใด?", options: ["การระบายความร้อนเซิร์ฟเวอร์", "ตัวกลางควบคุมความปลอดภัยระหว่างผู้ใช้และบริการคลาวด์", "การผลิตชิปประมวลผล", "การออกแบบหน้าจอแอปพลิเคชัน"], answer: 1 },
+    { q: "การโจมตีแบบ DDoS ส่งผลเสียอย่างไรต่อ Cloud?", options: ["ทำให้พื้นที่เต็ม", "ทำให้ระบบหยุดชะงักจากการส่งข้อมูลจำนวนมหาศาล", "ทำให้รหัสผ่านถูกเปลี่ยน", "ทำให้ค่าบริการถูกลง"], answer: 1 },
+    { q: "ใครมีหน้าที่รับผิดชอบความปลอดภัยของข้อมูล (Data) ในโมเดล IaaS?", options: ["ผู้ให้บริการคลาวด์", "ผู้ใช้บริการ (Customer)", "รัฐบาล", "ผู้ผลิตฮาร์ดแวร์"], answer: 1 },
+    { q: "Zero Trust Architecture มีหลักการสำคัญอย่างไร?", options: ["เชื่อใจทุกคนในระบบ", "ไม่เชื่อใจใครเลยและต้องตรวจสอบการเข้าถึงเสมอ", "ให้ทุกคนเข้าถึงข้อมูลได้อิสระ", "ไม่ต้องใช้รหัสผ่าน"], answer: 1 },
+    { q: "IAM (Identity and Access Management) เกี่ยวข้องกับเรื่องใด?", options: ["การจัดการสิทธิ์การเข้าถึงของผู้ใช้", "การซ่อมบำรุงเซิร์ฟเวอร์", "การทำความสะอาดดาต้าเซ็นเตอร์", "การเลือกซื้อแพลตฟอร์ม Cloud"], answer: 0 }
+],
+chapter9: [
+    { q: "SLA (Service Level Agreement) มีความสำคัญอย่างไร?", options: ["เป็นคู่มือการใช้งานซอฟต์แวร์", "กำหนดมาตรฐานและคุณภาพการให้บริการ", "เป็นใบแจ้งหนี้รายเดือน", "เป็นส่วนลดค่าบริการ"], answer: 1 },
+    { q: "ค่า Uptime 99.9% หมายถึงอะไร?", options: ["ระบบจะล่มทุกวัน", "ระบบต้องพร้อมใช้งานเกือบตลอดเวลา", "ข้อมูลจะหายไป 0.1%", "ความเร็วอินเทอร์เน็ตจะลดลง"], answer: 1 },
+    { q: "หากผู้ให้บริการไม่สามารถทำตามเงื่อนไขใน SLA ได้ จะเกิดอะไรขึ้น?", options: ["ผู้ใช้ต้องจ่ายเงินเพิ่ม", "ผู้ให้บริการต้องชดเชยตามที่ตกลงไว้", "ระบบจะถูกลบทิ้ง", "ไม่มีอะไรเกิดขึ้น"], answer: 1 },
+    { q: "GDPR คือข้อตกลงที่เกี่ยวข้องกับเรื่องใด?", options: ["ความแรงของสัญญาณ WiFi", "การคุ้มครองข้อมูลส่วนบุคคล", "การจัดการฮาร์ดแวร์", "การใช้พลังงานสะอาด"], answer: 1 },
+    { q: "Compliance Agreement เน้นเรื่องใดเป็นหลัก?", options: ["การออกแบบโลโก้", "การปฏิบัติตามกฎหมายและมาตรฐานข้อบังคับ", "การเพิ่มจำนวนพนักงาน", "การเขียนโปรแกรม"], answer: 1 },
+    { q: "ส่วนประกอบใดใน SLA ที่บอกถึงความเร็วในการแก้ปัญหา?", options: ["Uptime", "Response Time (เวลาในการตอบสนอง)", "Storage Capacity", "Encryption Level"], answer: 1 },
+    { q: "Service Credit หมายถึงอะไรในบริบทของ SLA?", options: ["คะแนนสะสมแลกของรางวัล", "การชดเชยในรูปแบบส่วนลดค่าบริการเมื่อระบบล่ม", "วงเงินกู้ยืม", "บัตรเครดิตของผู้ให้บริการ"], answer: 1 },
+    { q: "การตรวจสอบ SLA (SLA Monitoring) ทำเพื่ออะไร?", options: ["เพื่อแอบดูข้อมูลลูกค้า", "เพื่อติดตามว่าผู้ให้บริการทำได้ตามข้อตกลงหรือไม่", "เพื่อเพิ่มความเร็ว CPU", "เพื่อเปลี่ยนรหัสผ่าน"], answer: 1 },
+    { q: "Security Agreement กำหนดเรื่องใด?", options: ["ราคาค่าเช่า Cloud", "มาตรการรักษาความปลอดภัยที่ผู้ให้บริการต้องปฏิบัติตาม", "ชื่อพนักงานขาย", "สถานที่ตั้งของบริษัทผู้ใช้"], answer: 1 },
+    { q: "ข้อใดคือความเสี่ยงหากไม่มีข้อตกลงการรับประกันคุณภาพ (SLA)?", options: ["คอมพิวเตอร์จะเสียบ่อย", "ผู้ใช้ไม่มีสิทธิ์เรียกร้องเมื่อบริการขัดข้อง", "อินเทอร์เน็ตจะใช้งานไม่ได้", "จะใช้งาน Cloud ไม่ได้เลย"], answer: 1 }
+],
+chapter10: [
+    { q: "Cloud Computing ช่วยธุรกิจในด้านความคล่องตัว (Agility) อย่างไร?", options: ["ทำให้พนักงานทำงานช้าลง", "ปรับขนาดทรัพยากรได้รวดเร็วตามความต้องการของตลาด", "เพิ่มขั้นตอนการอนุมัติงบประมาณ", "ทำให้ต้องซื้อฮาร์ดแวร์เพิ่มเสมอ"], answer: 1 },
+    { q: "ในอุตสาหกรรมการเงิน (Finance) Cloud มีบทบาทเด่นในเรื่องใด?", options: ["การออกแบบธนบัตร", "การวิเคราะห์ความเสี่ยงและการป้องกันการฉ้อโกง", "การพิมพ์สมุดบัญชี", "การผลิตตู้ ATM"], answer: 1 },
+    { q: "Telemedicine ในอุตสาหกรรม Healthcare เกี่ยวข้องกับข้อใด?", options: ["การจัดส่งยาด้วยโดรน", "การวินิจฉัยและรักษาทางไกลผ่านระบบคลาวด์", "การผลิตเตียงคนไข้", "การจองตั๋วเครื่องบิน"], answer: 1 },
+    { q: "ประโยชน์หลักของการใช้ Cloud ในด้านการลดต้นทุนคืออะไร?", options: ["ไม่ต้องจ่ายค่าไฟฟ้าเลย", "เปลี่ยนจากค่าใช้จ่ายลงทุน (CapEx) เป็นค่าใช้จ่ายดำเนินงาน (OpEx)", "ทำให้ไม่ต้องจ้างพนักงานไอที", "ได้ใช้ซอฟต์แวร์ฟรีตลอดไป"], answer: 1 },
+    { q: "Big Data Analytics บน Cloud ช่วยองค์กรอย่างไร?", options: ["ช่วยให้คอมพิวเตอร์ดูสวยงาม", "ช่วยวิเคราะห์ข้อมูลมหาศาลเพื่อตอบสนองลูกค้าได้ดีขึ้น", "ช่วยลดความเร็วอินเทอร์เน็ต", "ช่วยในการพิมพ์เอกสาร"], answer: 1 },
+    { q: "ในด้านการผลิต (Manufacturing) เทคโนโลยีใดที่มักใช้คู่กับ Cloud?", options: ["เครื่องคิดเลข", "IoT และการวิเคราะห์ข้อมูลแบบเรียลไทม์", "การเขียนจดหมาย", "การใช้โทรศัพท์พื้นฐาน"], answer: 1 },
+    { q: "ความยืดหยุ่น (Scalability) หมายถึงอะไรในบริบทของธุรกิจ?", options: ["การมีพนักงานจำนวนมาก", "การเพิ่มหรือลดพื้นที่เก็บข้อมูลตามปริมาณการใช้งานจริง", "การมีสำนักงานหลายแห่ง", "การเปลี่ยนโลโก้บริษัท"], answer: 1 },
+    { q: "ข้อใดคือตัวอย่างบริการ SaaS ที่องค์กรนิยมใช้?", options: ["Google Workspace / Microsoft 365", "สาย LAN", "เครื่องสำรองไฟ", "ฮาร์ดดิสก์พกพา"], answer: 0 },
+    { q: "การประมวลผลใกล้แหล่งกำเนิดข้อมูลเพื่อความรวดเร็วเรียกว่าอะไร?", options: ["Center Computing", "Edge Computing", "Slow Computing", "Home Computing"], answer: 1 },
+    { q: "Cloud Computing ช่วยให้ธุรกิจ SME แข่งกับบริษัทใหญ่ได้อย่างไร?", options: ["ทำให้มีเงินทุนเท่ากัน", "เข้าถึงเทคโนโลยีระดับโลกได้ในราคาที่จ่ายไหว", "ทำให้พนักงานลาออกน้อยลง", "ทำให้ไม่ต้องเสียภาษี"], answer: 1 }
+],
+chapter11: [
+    { q: "Serverless Computing มีลักษณะเด่นอย่างไร?", options: ["ไม่มีเซิร์ฟเวอร์อยู่จริงในโลก", "นักพัฒนาไม่ต้องจัดการเซิร์ฟเวอร์เอง จ่ายตามการเรียกใช้", "ต้องซื้อเซิร์ฟเวอร์มาตั้งที่บ้าน", "ใช้งานได้เฉพาะตอนกลางวัน"], answer: 1 },
+    { q: "ตำแหน่ง Cloud Security Engineer ทำหน้าที่อะไร?", options: ["ซ่อมคอมพิวเตอร์", "ดูแลความปลอดภัยและมาตรการป้องกันบนระบบคลาวด์", "เขียนโปรแกรมกราฟิก", "จัดทำบัญชีรายรับรายจ่าย"], answer: 1 },
+    { q: "ทักษะใดสำคัญที่สุดสำหรับ Cloud Architect?", options: ["การพิมพ์สัมผัส", "การออกแบบโครงสร้างระบบคลาวด์ให้มีประสิทธิภาพและปลอดภัย", "การซ่อมเครื่องพิมพ์", "การขายประกัน"], answer: 1 },
+    { q: "Cloud Data Engineer เกี่ยวข้องกับงานประเภทใด?", options: ["การออกแบบ Data Pipeline และการจัดการ Big Data", "การตกแต่งรูปภาพ", "การตัดต่อวิดีโอ", "การดูแลหน้าเว็บ"], answer: 0 },
+    { q: "Event-Driven ใน Serverless หมายถึงอะไร?", options: ["การจัดงานเลี้ยงในบริษัท", "การทำงานเมื่อมีเหตุการณ์มากระตุ้น เช่น การอัปโหลดไฟล์", "การปิดระบบทุกวันเสาร์", "การส่งอีเมลโฆษณา"], answer: 1 },
+    { q: "Edge Computing สำคัญมากในเทคโนโลยีใด?", options: ["การทำบัญชี", "รถยนต์ไร้คนขับ และอุปกรณ์ IoT", "การใช้โปรแกรม Excel", "การอ่านหนังสืออิเล็กทรอนิกส์"], answer: 1 },
+    { q: "FaaS ย่อมาจากอะไรในโลกคลาวด์?", options: ["Files as a Service", "Function as a Service", "Fast as a System", "Food as a Service"], answer: 1 },
+    { q: "แนวโน้ม 'Multi-cloud' หมายถึงอะไร?", options: ["การใช้ผู้ให้บริการคลาวด์เพียงรายเดียว", "การใช้บริการจากผู้ให้บริการคลาวด์หลายรายพร้อมกัน", "การเก็บข้อมูลในคอมพิวเตอร์หลายเครื่อง", "การมีก้อนเมฆหลายสี"], answer: 1 },
+    { q: "ตำแหน่ง Cloud Consultant มีหน้าที่หลักคืออะไร?", options: ["ขายเครื่องเซิร์ฟเวอร์", "ให้คำปรึกษาและวางกลยุทธ์การใช้งานคลาวด์ให้องค์กร", "ซ่อมสายไฟ", "ติดตั้งระบบปฏิบัติการ"], answer: 1 },
+    { q: "ทำไมทักษะ DevOps ถึงสำคัญในสายงานคลาวด์?", options: ["ช่วยให้พิมพ์โค้ดได้สวย", "ช่วยเชื่อมโยงการพัฒนาและการปฏิบัติการให้รวดเร็วและต่อเนื่อง", "ช่วยลดค่าใช้จ่ายอินเทอร์เน็ต", "ช่วยให้ใช้ Photoshop เก่งขึ้น"], answer: 1 }
+],
+chapter12: [
+    { q: "Microservices Architecture ต่างจาก Monolith อย่างไร?", options: ["ระบบทำงานเป็นก้อนเดียว", "แยกการทำงานเป็นบริการย่อยๆ ที่ทำงานอิสระต่อกัน", "ต้องใช้ภาษาโปรแกรมเดียวทั้งระบบ", "แก้ไขยากกว่า"], answer: 1 },
+    { q: "Containerization (เช่น Docker) มีข้อดีอย่างไร?", options: ["ทำให้ไฟล์ใหญ่ขึ้น", "สร้างสภาพแวดล้อมที่เหมือนกัน รันได้ทุกที่อย่างรวดเร็ว", "ใช้ทรัพยากรมากกว่า VM", "ต้องใช้การ์ดจอแรงๆ เท่านั้น"], answer: 1 },
+    { q: "Kubernetes (K8s) มีหน้าที่อะไรในระบบคลาวด์?", options: ["ใช้ดูหนังออนไลน์", "จัดการและควบคุมการทำงานของ Containers (Orchestration)", "ใช้พิมพ์งานเอกสาร", "ใช้แฮกข้อมูลผู้อื่น"], answer: 1 },
+    { q: "Block Storage เหมาะสำหรับงานประเภทใด?", options: ["เก็บไฟล์รูปภาพทั่วไป", "ระบบฐานข้อมูลที่ต้องการประสิทธิภาพสูง (Low Latency)", "การสำรองข้อมูลระยะยาว", "การแชร์ไฟล์ในแผนก"], answer: 1 },
+    { q: "Object Storage มีจุดเด่นที่สุดในเรื่องใด?", options: ["ความเร็วสูงสุด", "การขยายตัว (Scalability) ได้ระดับ Petabytes/Exabytes", "การติดตั้งที่ง่ายที่สุด", "ราคาแพงที่สุด"], answer: 1 },
+    { q: "Metadata มีความสำคัญอย่างไรใน Object Storage?", options: ["ทำให้ไฟล์มีขนาดเล็กลง", "ช่วยในการค้นหาและจัดหมวดหมู่ข้อมูลขนาดใหญ่", "ทำให้เน็ตเร็วขึ้น", "ใช้สำหรับตั้งชื่อไฟล์"], answer: 1 },
+    { q: "Self-Healing ใน Kubernetes หมายถึงอะไร?", options: ["การที่โปรแกรมซ่อมตัวเองเมื่อเสียหาย", "การที่พนักงานไอทีไม่ต้องนอน", "การเพิ่มความเร็ว CPU อัตโนมัติ", "การปิดเครื่องเองเมื่อร้อน"], answer: 0 },
+    { q: "เทคโนโลยี Virtualization คืออะไร?", options: ["การซื้อคอมพิวเตอร์ใหม่", "การจำลองทรัพยากรฮาร์ดแวร์ให้ทำงานได้หลายระบบพร้อมกัน", "การเล่นเกม VR", "การติดกล้องวงจรปิด"], answer: 1 },
+    { q: "Immutable Infrastructure หมายถึงอะไร?", options: ["การเปลี่ยนโค้ดตลอดเวลา", "โครงสร้างพื้นฐานที่สร้างขึ้นแล้วไม่แก้ไข แต่จะสร้างใหม่เมื่อมีการอัปเดต", "การใช้ระบบเดิมไปตลอด 10 ปี", "การไม่มีความปลอดภัย"], answer: 1 },
+    { q: "API Gateway ทำหน้าที่อะไรใน Microservices?", options: ["เป็นทางเข้าหลักและตัวกลางจัดการคำขอไปยังบริการต่างๆ", "ใช้เชื่อมต่ออินเทอร์เน็ต", "ใช้เก็บฐานข้อมูล", "ใช้สำหรับส่งอีเมล"], answer: 0 }
+],
+chapter13: [
+    { q: "การออกแบบระบบแบบ Zero Cost ใน Workshop เน้นใช้สิ่งใด?", options: ["โปรแกรมเถื่อน", "AWS Free Tier โควต้าใช้งานฟรี", "คอมพิวเตอร์มือสอง", "การขโมยสัญญาณเน็ต"], answer: 1 },
+    { q: "ในโครงการ Student Record System ใช้ฐานข้อมูลประเภทใด?", options: ["Excel", "MySQL (Relational Database)", "Text File", "Access"], answer: 1 },
+    { q: "AWS Lambda ถูกนำมาใช้ทำหน้าที่อะไรในโปรเจกต์นี้?", options: ["เก็บไฟล์รูปภาพ", "รันโค้ดแบบ Serverless สำหรับประมวลผลข้อมูล", "เป็นตัวกระจายสัญญาณ", "ใช้สำหรับดู Log"], answer: 1 },
+    { q: "EC2 ในโปรเจกต์นี้ทำหน้าที่เปรียบเสมือนสิ่งใด?", options: ["ฐานข้อมูล", "เซิร์ฟเวอร์เสมือนสำหรับรันแอปพลิเคชัน", "สาย LAN เสมือน", "หน้าจอคอมพิวเตอร์"], answer: 1 },
+    { q: "การใช้ Nginx ใน Workshop นี้มีวัตถุประสงค์เพื่ออะไร?", options: ["ทำ Reverse Proxy และจัดการทางเข้าเว็บ", "ใช้ตกแต่งรูปภาพ", "ใช้ส่งอีเมล", "ใช้เขียนโค้ด Python"], answer: 0 },
+    { q: "Security by Design (Defense in Depth) หมายถึงอะไร?", options: ["การใส่รหัสผ่านชั้นเดียว", "การวางระบบความปลอดภัยหลายชั้นซ้อนกัน", "การไม่ให้ใครเข้าใช้เว็บเลย", "การซ่อนคอมพิวเตอร์ไว้ในตู้"], answer: 1 },
+    { q: "CloudWatch ถูกนำมาใช้ในโปรเจกต์เพื่ออะไร?", options: ["ใช้ดูเวลา", "การติดตาม (Monitoring) และตรวจสอบการทำงานของระบบ", "ใช้พยากรณ์อากาศ", "ใช้จองคิวประชุม"], answer: 1 },
+    { q: "ทำไมการทดลองใช้ Free Tier ถึงสำคัญสำหรับนักศึกษา?", options: ["เพื่อให้ได้ของฟรี", "เพื่อเรียนรู้สถาปัตยกรรมจริงโดยไม่มีภาระค่าใช้จ่าย", "เพื่อให้คอมพิวเตอร์เร็วขึ้น", "เพื่อลดเวลาเรียน"], answer: 1 },
+    { q: "การทำ CRUD Operations หมายถึงอะไร?", options: ["การทำความสะอาดคอมพิวเตอร์", "การ สร้าง, อ่าน, แก้ไข, และลบ ข้อมูลในระบบ", "การเขียนโปรแกรมกราฟิก", "การเชื่อมต่อเครือข่าย"], answer: 1 },
+    { q: "บทเรียนสำคัญจาก Workshop นี้คืออะไร?", options: ["ต้องซื้อเครื่องแรงๆ เสมอ", "การออกแบบระบบที่ดีต้องเน้นความคุ้มค่าและความปลอดภัย", "การทำงานคนเดียวดีที่สุด", "ไม่จำเป็นต้องมีแผนผังระบบ"], answer: 1 }
+]
+        };
+
+        const list = document.getElementById('chapter-list');
+        let unlockedCount = 0;
+
+        // วนลูปสร้างรายการ 1-13
+        for (let i = 1; i <= 13; i++) {
+            const data = quizData['chapter' + i];
+            const isLocked = !data;
+            const name = chapterNames[i];
+            
+            if(!isLocked) unlockedCount++;
+
+            list.innerHTML += `
+                <div class="list-group-item d-flex justify-content-between align-items-center py-4 ${isLocked ? 'opacity-50' : ''}">
+                    <div>
+                        <h6 class="mb-1 ${isLocked ? 'text-secondary' : 'fw-bold fs-5 text-white'}">
+                            บทที่ ${i}: ${name}
+                        </h6>
+                        ${isLocked ? 
+                            `<small class="text-muted italic"><i class="bi bi-lock-fill me-1"></i>รออัปโหลดเนื้อหา</small>` : 
+                            `<small class="text-info"><i class="bi bi-unlock-fill me-1"></i>พร้อมลุย! (${data.length} ข้อ)</small>`
+                        }
+                    </div>
+                    ${isLocked ? 
+                        `<button class="btn btn-secondary-custom px-4 py-2 disabled">เร็วๆ นี้</button>` : 
+                        `<button class="btn btn-play px-4 py-2" onclick="startQuiz(${i})">เริ่มเกม <i class="bi bi-play-fill ms-1"></i></button>`
+                    }
+                </div>
+            `;
+        }
+
+        // อัปเดต Progress Bar
+        const progressPercent = Math.round((unlockedCount / 13) * 100);
+        document.getElementById('progress-bar').style.width = progressPercent + '%';
+        document.getElementById('progress-text').innerText = unlockedCount + ' / 13 Chapters Ready';
+
+        function startQuiz(id) {
+            const data = quizData['chapter' + id];
+            if(data) {
+                sessionStorage.setItem('currentQuiz', JSON.stringify(data));
+                sessionStorage.setItem('chapterName', 'บทที่ ' + id + ': ' + chapterNames[id]);
+                //alert("INITIALIZING MISSION " + id + "...");
+                window.location.href = 'quiz_engine.html';
+            }
+        }
+
+        function startFinalExam() {
+            let allQuestions = [];
+            
+            // วนลูปดึงคำถามจากทุกบทที่มีอยู่ใน quizData
+            for (let i = 1; i <= 13; i++) {
+                const chapter = quizData['chapter' + i];
+                if (chapter && chapter.length > 0) {
+                    allQuestions = allQuestions.concat(chapter);
+                }
+            }
+
+            if (allQuestions.length === 0) {
+                alert("ไม่พบข้อมูลคำถามในระบบ");
+                return;
+            }
+
+            // สุ่มคำถามทั้งหมด
+            allQuestions.sort(() => Math.random() - 0.5);
+            
+            // ถ้ามีเกิน 40 ให้ตัดเอาแค่ 40 ถ้าไม่ถึงให้ใช้ทั้งหมดที่มี
+            const totalToSelect = Math.min(allQuestions.length, 40);
+            const finalSelection = allQuestions.slice(0, totalToSelect);
+            
+            // เก็บลง sessionStorage แล้วเปลี่ยนหน้า
+            sessionStorage.setItem('finalExamPool', JSON.stringify(finalSelection));
+            alert("INITIALIZING FINAL EXAM: " + totalToSelect + " QUESTIONS READY.");
+            window.location.href = 'final_exam.html';
+        }
+    </script>
+</body>
+</html>
