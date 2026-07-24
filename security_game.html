@@ -3,306 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhishGuard Pro - Dark Edition</title>
-    <!-- Bootstrap 5 & Icons -->
+    <title>Security Game Challenge - SPU QUIZ MASTER</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
     <style>
         :root {
-            --dark-bg: #0f172a;
-            --dark-card: #1e293b;
-            --border-dark: #334155;
-            --email-white: #ffffff;
-            --text-gray: #94a3b8;
+            --bg-color: #0f172a;
+            --accent-color: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-purple: #a855f7;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        body { 
-            background-color: var(--dark-bg); 
-            color: #f1f5f9; 
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg-color);
+            color: #f8fafc;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
         }
 
-        /* Navbar Custom */
-        .navbar { background-color: var(--dark-card) !important; border-bottom: 1px solid var(--border-dark); }
-
-        /* Main Layout */
-        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
-
-        /* Column 1: Narrative (Dark) */
-        .narrative-col { 
-            width: 300px; 
-            background: var(--dark-card); 
-            border-right: 1px solid var(--border-dark); 
-            padding: 2rem; 
-        }
-        .npc-box { background: var(--dark-bg); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border-dark); }
-
-        /* Column 2: Inbox (White) */
-        .inbox-col { 
-            width: 320px; 
-            background: var(--email-white); 
-            color: #1e293b;
-            border-right: 1px solid #e2e8f0; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        .email-item { padding: 1rem; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s; }
-        .email-item:hover { background-color: #f8fafc; }
-        .email-item.active { background-color: #eff6ff; border-left: 4px solid #0d6efd; }
-        .email-item.unread { font-weight: bold; }
-
-        /* Column 3: View (Gray BG with White Card) */
-        .view-col { 
-            flex: 1; 
-            background: var(--dark-bg); 
-            display: flex; 
-            flex-direction: column; 
-            padding: 20px;
+        /* Nav Bar / Top Bar */
+        .top-bar {
+            padding: 20px 0;
         }
 
-        .email-container {
-            background: var(--email-white);
-            color: #1e293b;
+        .btn-back {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: #94a3b8;
             border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            overflow: hidden;
+            padding: 8px 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
         }
 
-        .email-toolbar { 
-            background: #ffffff; 
-            border-bottom: 1px solid #e2e8f0; 
-            padding: 10px 20px;
+        .btn-back:hover {
+            color: #fff;
+            border-color: var(--accent-color);
+            transform: translateX(-5px);
+        }
+
+        .hero-section {
+            padding: 30px 0 40px;
+            text-align: center;
+        }
+
+        .brand-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            background: linear-gradient(to right, #38bdf8, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Game Card Styling */
+        .game-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dynamic Glow Borders for Each Game */
+        .game-card.g-blue:hover { border-color: var(--accent-color); }
+        .game-card.g-green:hover { border-color: var(--accent-green); }
+        .game-card.g-purple:hover { border-color: var(--accent-purple); }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .game-card.g-blue::before { background: linear-gradient(90deg, #38bdf8, #2563eb); }
+        .game-card.g-green::before { background: linear-gradient(90deg, #22c55e, #10b981); }
+        .game-card.g-purple::before { background: linear-gradient(90deg, #a855f7, #ec4899); }
+
+        .game-card:hover::before { opacity: 1; }
+
+        /* Icon Box Styles */
+        .icon-box {
+            width: 75px;
+            height: 75px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.2rem;
+            transition: transform 0.3s;
         }
 
-        .email-content-scroll { padding: 40px; overflow-y: auto; flex: 1; }
-
-        /* Highlights */
-        .red-flag-highlight { 
-            background-color: #fff3cd; 
-            border: 2px dashed #ffc107; 
-            padding: 2px 4px; 
-            border-radius: 4px;
+        .game-card:hover .icon-box {
+            transform: scale(1.1) rotate(-5deg);
         }
 
-        .btn-decorative { color: #94a3b8; pointer-events: none; opacity: 0.5; }
-        
-        /* Modal Custom */
-        .modal-content { border: none; border-radius: 15px; }
+        .icon-box.ib-blue { background: rgba(56, 189, 248, 0.1); color: var(--accent-color); }
+        .icon-box.ib-green { background: rgba(34, 197, 94, 0.1); color: var(--accent-green); }
+        .icon-box.ib-purple { background: rgba(168, 85, 247, 0.1); color: var(--accent-purple); }
+
+        /* Custom Play Buttons */
+        .btn-play {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-blue { background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); }
+        .btn-blue:hover { box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
+
+        .btn-green { background: linear-gradient(135deg, #22c55e 0%, #059669 100%); }
+        .btn-green:hover { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+
+        .btn-purple { background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); }
+        .btn-purple:hover { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+
+        /* Stats & Tags Pill */
+        .stats-pill {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .badge-tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
 
-<!-- Header -->
-<nav class="navbar navbar-dark px-4 py-2">
-    <span class="navbar-brand mb-0 h1"><i class="bi bi-shield-lock-fill text-primary"></i> PhishGuard Simulator</span>
-    <div class="text-white">
-        <span class="fs-5 fw-bold">Score: <span id="score-display" class="badge bg-primary">0</span></span>
-    </div>
-</nav>
+    <div class="container">
+        <!-- Top Back Navigation -->
+        <div class="top-bar">
+            <a href="index.html" class="btn-back">
+                <i class="bi bi-arrow-left me-2"></i> กลับหน้าหลัก
+            </a>
+        </div>
 
-<div class="main-wrapper">
-    
-    <!-- Col 1: Narrative (Dark Sidebar) -->
-    <div class="narrative-col">
-        <div class="text-center mb-4">
-            <div style="font-size: 4rem;">🦖</div>
-            <h5 class="mt-2 fw-bold text-white">INTJ Scientist Rex</h5>
-            <span class="badge bg-secondary">System Mentor</span>
-        </div>
-        <div class="npc-box">
-            <p id="instruction-text" class="small mb-0 text-gray">
-                "เตรียมตัวให้พร้อม... ผมกำลังจำลองการโจมตีเข้ามาในระบบของคุณ อย่าหลงกลล่ะ"
-            </p>
-        </div>
-        <div id="status-update" class="mt-4 text-center text-primary fw-bold"></div>
-    </div>
-
-    <!-- Col 2: Inbox (Light Middle) -->
-    <div class="inbox-col">
-        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-            <span class="fw-bold">Inbox</span>
-            <span class="badge bg-light text-dark border">2 Messages</span>
-        </div>
-        <div id="email-list-container" class="overflow-auto">
-            <div class="email-item">
-                <div class="d-flex justify-content-between">
-                    <span class="small fw-bold text-truncate">ยินดีต้อนรับสู่ระบบ</span>
-                    <span class="text-muted small">10:00</span>
-                </div>
-                <div class="small text-muted text-truncate">Admin Team</div>
+        <!-- Hero Section -->
+        <header class="hero-section">
+            <h1 class="brand-title mb-2">CYBER SECURITY HUB</h1>
+            <p class="text-secondary lead">ศูนย์รวมมินิเกมฝึกทักษะความมั่นคงปลอดภัยและคุ้มครองข้อมูลส่วนบุคคล (PII)</p>
+            <div class="mt-3">
+                <span class="stats-pill"><i class="bi bi-shield-check me-2" style="color: var(--accent-green);"></i>3 Interactive Games Available</span>
             </div>
-        </div>
-    </div>
+        </header>
 
-    <!-- Col 3: Email View (Right Side) -->
-    <div class="view-col">
-        <div class="email-container">
-            <!-- Toolbar -->
-            <div class="email-toolbar">
-                <button id="btn-report" class="btn btn-warning btn-sm d-none" onclick="handleAction('report')">
-                    <i class="bi bi-flag-fill"></i> รายงาน Phishing
-                </button>
-                <button id="btn-delete" class="btn btn-outline-danger btn-sm d-none" onclick="handleAction('delete')">
-                    <i class="bi bi-trash"></i> ลบเมล
-                </button>
-                <div style="width: 1px; height: 20px; background: #ddd; margin: 0 5px;"></div>
-                <i class="bi bi-reply btn-decorative ms-2"></i>
-                <i class="bi bi-forward btn-decorative ms-3"></i>
-                <i class="bi bi-printer btn-decorative ms-3"></i>
-            </div>
-
-            <!-- Content Area -->
-            <div id="email-content-area" class="email-content-scroll">
-                <div class="text-center text-muted mt-5">
-                    <i class="bi bi-envelope-paper display-1 opacity-25"></i>
-                    <p class="mt-3">กรุณาเลือกอีเมลเพื่อเริ่มตรวจสอบ</p>
+        <!-- Game Selection Grid -->
+        <div class="row g-4 justify-content-center pb-5">
+            
+            <!-- Game 1 Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card game-card g-blue h-100 p-4" onclick="location.href='level1.html'">
+                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="icon-box ib-blue">
+                                <i class="bi bi-file-earmark-lock-fill"></i>
+                            </div>
+                            <span class="badge badge-tag text-info mb-2">GAME 01</span>
+                            <h4 class="fw-bold mb-2 text-light">Data Redactor</h4>
+                            <h6 class="text-info mb-3">นักคาดแถบดำ PII</h6>
+                            <p class="text-secondary small mb-4">สวมบทบาท DPO ตรวจสอบเอกสารสำคัญ 3 แผ่น คาดแถบดำเซนเซอร์ข้อมูลส่วนบุคคลก่อนส่งออก</p>
+                        </div>
+                        
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+                                <span class="small text-info"><i class="bi bi-journals me-1"></i> 3 เอกสาร</span>
+                                <span class="small text-warning"><i class="bi bi-star-fill me-1"></i> Level: Normal</span>
+                            </div>
+                            <button class="btn btn-play btn-blue w-100">
+                                เล่นเกมที่ 1 <i class="bi bi-play-fill ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- Modal Analysis (Success/Warning) -->
-<div class="modal fade" id="analysisModal" data-bs-backdrop="static" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content shadow-lg">
-            <div class="modal-header text-white" id="modal-header">
-                <h5 class="modal-title" id="modal-title">วิเคราะห์ความปลอดภัย</h5>
-            </div>
-            <div class="modal-body p-4">
-                <div class="text-center mb-4" id="modal-icon" style="font-size: 3rem;"></div>
-                <h4 id="analysis-feedback" class="text-center fw-bold mb-4"></h4>
-                <div class="alert alert-light border">
-                    <h6 class="fw-bold text-dark"><i class="bi bi-lightbulb-fill text-warning"></i> จุดสังเกตที่คุณควรระวัง:</h6>
-                    <ul id="red-flags-list" class="mt-3"></ul>
+            <!-- Game 2 Card (Placeholder / Reserved for Future Game) -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card game-card g-purple h-100 p-4" onclick="location.href='phishing_game.html'">
+                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="icon-box ib-purple">
+                                <i class="bi bi-shield-exclamation"></i>
+                            </div>
+                            <span class="badge badge-tag text-warning mb-2">GAME 02</span>
+                            <h4 class="fw-bold mb-2 text-light">Phishing Detector</h4>
+                            <h6 style="color: var(--accent-purple);" class="mb-3">จับผิดอีเมลวิศวกรรมสังคม</h6>
+                            <p class="text-secondary small mb-4">วิเคราะห์ข้อความและลิงก์ของภัยคุกคาม Cyber Attack ค้นหาสิ่งผิดปกติก่อนกดคลิก</p>
+                        </div>
+                        
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+                                <span class="small text-info"><i class="bi bi-send-exclamation me-1"></i> 3 สถานการณ์</span>
+                                <span class="small text-warning"><i class="bi bi-star-fill me-1"></i> Level: Hard</span>
+                            </div>
+                            <button class="btn btn-play btn-purple w-100">
+                                เล่นเกมที่ 2 <i class="bi bi-play-fill ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-dark w-100 py-2" onclick="location.reload()">ลองใหม่อีกครั้ง</button>
+
+            <!-- Game 3 Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card game-card g-green h-100 p-4" onclick="location.href='desk_cleaner_3scenes.html'">
+                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="icon-box ib-green">
+                                <i class="bi bi-display"></i>
+                            </div>
+                            <span class="badge badge-tag text-success mb-2">GAME 03</span>
+                            <h4 class="fw-bold mb-2 text-light">Security Inspector</h4>
+                            <h6 class="text-success mb-3">3 สถานการณ์ความปลอดภัย</h6>
+                            <p class="text-secondary small mb-4">สำรวจและคลิกแก้ไขจุดเสี่ยง PII & Security ใน 3 สถานการณ์ (โต๊ะทำงาน, หน้าจอคอม, มือถือ)</p>
+                        </div>
+                        
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+                                <span class="small text-info"><i class="bi bi-geo-alt me-1"></i> 3 สถานการณ์</span>
+                                <span class="small text-warning"><i class="bi bi-star-fill me-1"></i> Level: Easy</span>
+                            </div>
+                            <button class="btn btn-play btn-green w-100">
+                                เล่นเกมที่ 3 <i class="bi bi-play-fill ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    let score = 0;
-    const modal = new bootstrap.Modal(document.getElementById('analysisModal'));
-
-    // ตั้งเวลา 5 วินาที เมลเข้า
-    let timeLeft = 5;
-    const timer = setInterval(() => {
-        timeLeft--;
-        document.getElementById('status-update').innerText = `เมลทดสอบจะเข้าใน ${timeLeft}...`;
-        if(timeLeft <= 0) {
-            clearInterval(timer);
-            document.getElementById('status-update').innerText = "📩 ได้รับเมลใหม่!";
-            showPhishingEmail();
-        }
-    }, 1000);
-
-    function showPhishingEmail() {
-        const list = document.getElementById('email-list-container');
-        const item = document.createElement('div');
-        item.className = 'email-item unread active';
-        item.innerHTML = `
-            <div class="d-flex justify-content-between">
-                <span class="small fw-bold text-danger">⚠️ แจ้งเปลี่ยนรหัสผ่านด่วน</span>
-                <span class="text-primary small">Now</span>
-            </div>
-            <div class="small text-muted">IT-Security &lt;admin@verify-company.net&gt;</div>
-        `;
-        item.onclick = loadContent;
-        list.prepend(item);
-        document.getElementById('instruction-text').innerText = "ตรวจพบอีเมลต้องสงสัย! ใช้ทักษะของคุณวิเคราะห์จุดผิดปกติให้เจอ";
-    }
-
-    function loadContent() {
-        document.getElementById('btn-report').classList.remove('d-none');
-        document.getElementById('btn-delete').classList.remove('d-none');
-        
-        const area = document.getElementById('email-content-area');
-        area.innerHTML = `
-            <div class="mb-4">
-                <h2 class="fw-bold">⚠️ ยืนยันการเปลี่ยนรหัสผ่านของคุณ</h2>
-                <p class="text-muted mb-0">จาก: <b>IT-Security</b> &lt;admin@verify-company.net&gt;</p>
-                <p class="text-muted small">ถึง: คุณ (user@my-company.com)</p>
-            </div>
-            <hr>
-            <div style="font-size: 1.1rem; line-height: 1.8;">
-                <p>เรียนผู้ใช้งาน,</p>
-                <p>เราพบ <span id="f1">การเข้าใช้บัญชีของคุณจากรัสเซีย</span> หากไม่ใช่การกระทำของคุณ บัญชีของคุณอาจตกอยู่ในอันตราย</p>
-                <p>กรุณาคลิกที่ลิงก์ด้านล่างเพื่อทำการ <b>"ยกเลิกการเปลี่ยนรหัสผ่าน"</b> และตรวจสอบความปลอดภัยทันที:</p>
-                
-                <div class="text-center my-4">
-                    <a href="javascript:void(0)" class="btn btn-danger px-5 py-3 fw-bold" onclick="handleAction('click-link')" id="f2">
-                        คลิกเพื่อยกเลิกและตรวจสอบบัญชี (Security Check)
-                    </a>
-                </div>
-
-                <p class="text-muted" style="font-size: 0.9rem;">*หากไม่ดำเนินการภายใน 5 นาที <span id="f3">ระบบจะทำการล็อกบัญชีและลบข้อมูลถาวร</span></p>
-            </div>
-        `;
-    }
-
-    function handleAction(type) {
-        const title = document.getElementById('modal-title');
-        const header = document.getElementById('modal-header');
-        const feedback = document.getElementById('analysis-feedback');
-        const list = document.getElementById('red-flags-list');
-        const icon = document.getElementById('modal-icon');
-        list.innerHTML = "";
-
-        if(type === 'report') {
-            score += 100;
-            header.className = "modal-header bg-success";
-            icon.innerText = "✅";
-            feedback.innerHTML = "ยอดเยี่ยม! คุณรายงานได้ถูกต้อง";
-        } else if(type === 'delete') {
-            score -= 20;
-            header.className = "modal-header bg-warning";
-            icon.innerText = "🗑️";
-            feedback.innerHTML = "ปลอดภัยแต่ยังไม่ดีที่สุด! คุณลบเมลแล้ว แต่ควร 'รายงาน' เพื่อป้องกันผู้อื่น";
-        } else {
-            score -= 100; // หักคะแนนหนักกรณีคลิกลิงก์
-            header.className = "modal-header bg-danger";
-            icon.innerText = "💀";
-            feedback.innerHTML = "คุณถูกโจมตีแล้ว! การคลิกลิงก์คือจุดประสงค์ของแฮกเกอร์";
-        }
-
-        const flags = [
-            "<b>Email Domain ปลอม:</b> สังเกต '@verify-company.net' ซึ่งไม่ใช่โดเมนหลักของบริษัทคุณ",
-            "<b>สร้างความกลัว (Fear):</b> แฮกเกอร์อ้างเรื่องการล็อกอินจากรัสเซียและขู่ลบข้อมูลเพื่อบีบให้คุณตกใจ",
-            "<b>ลิงก์อันตราย:</b> ปุ่มสีแดงสดดึงดูดให้คุณคลิกโดยไม่เช็ค URL จริง"
-        ];
-
-        flags.forEach(f => {
-            const li = document.createElement('li');
-            li.className = "mb-2 text-dark";
-            li.innerHTML = f;
-            list.appendChild(li);
-        });
-
-        // Highlight Red Flags
-        document.getElementById('f1').classList.add('red-flag-highlight');
-        document.getElementById('f2').classList.add('red-flag-highlight');
-        document.getElementById('f3').classList.add('red-flag-highlight');
-
-        document.getElementById('score-display').innerText = score;
-        modal.show();
-    }
-</script>
-
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
