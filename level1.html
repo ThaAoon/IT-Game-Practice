@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Redactor: นักคาดแถบดำ ⬛🔍</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --paper-bg: #fdfbf7;
+      --text-dark: #1e293b;
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --border-color: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #f8fafc;
+      font-family: 'Sarabun', system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Container สไตล์ซองเอกสาร/บอร์ด */
+    .game-container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 650px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .ui-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* กระดาษเอกสาร A4 จำลอง */
+    .paper {
+      background-color: var(--paper-bg);
+      color: var(--text-dark);
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      font-size: 1.05rem;
+      line-height: 2.2;
+      position: relative;
+      border: 1px solid #e2e8f0;
+      min-height: 300px;
+    }
+
+    .paper-title {
+      font-weight: bold;
+      text-decoration: underline;
+      margin-bottom: 1rem;
+      font-size: 1.15rem;
+      color: #0f172a;
+      text-align: center;
+    }
+
+    /* สไตล์ข้อความจำลองปกติ */
+    .text-word {
+      display: inline-block;
+      padding: 0 4px;
+      margin: 2px 1px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .text-word:hover {
+      background-color: #e2e8f0;
+    }
+
+    /* สไตล์ข้อความที่โดนคาดแถบดำ */
+    .text-word.redacted {
+      background-color: #0f172a !important;
+      color: #0f172a !important;
+      border-radius: 2px;
+      box-shadow: 0 0 2px rgba(0,0,0,0.5);
+    }
+
+    /* Action Footer */
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      background-color: var(--accent-blue);
+      color: #0f172a;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Modal สรุปผล */
+    .modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(15, 23, 42, 0.95);
+      border-radius: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>⬛ Data Redactor: นักคาดแถบดำ</h1>
+    <p>คลิกที่ข้อความที่เป็น <b>PII (ข้อมูลส่วนบุคคล)</b> เพื่อคาดแถบดำปิดบังก่อนส่งเอกสาร!</p>
+  </header>
+
+  <div class="game-container">
+    
+    <!-- UI Status Bar -->
+    <div class="ui-bar">
+      <div>📄 เอกสารแผ่นที่: <span id="paper-num" style="color: var(--accent-blue);">1</span>/3</div>
+      <div>🎯 แถบดำที่คาดแล้ว: <span id="count-num" style="color: var(--accent-green);">0</span>/3</div>
+    </div>
+
+    <!-- แผ่นกระดาษเอกสาร -->
+    <div class="paper" id="paper-content">
+      <!-- ข้อความกระดาษจะถูกฉีดเข้ามาด้วย JS -->
+    </div>
+
+    <!-- ปุ่มส่งงาน -->
+    <div class="actions">
+      <span style="font-size: 0.85rem; color: #94a3b8;">*แต่ละแผ่นมี PII ซ่อนอยู่ 3 จุด</span>
+      <button id="submit-btn" class="btn">ตรวจและส่งเอกสาร ➔</button>
+    </div>
+
+    <!-- หน้าต่างสรุปผลเมื่อจบเกม -->
+    <div id="result-modal" class="modal hide">
+      <h2 id="result-title" style="font-size: 1.8rem; margin-bottom: 0.5rem;">🎉 ตรวจสอบสำเร็จ!</h2>
+      <p id="result-desc" style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;"></p>
+      <button id="restart-btn" class="btn">เล่นใหม่อีกครั้ง</button>
+    </div>
+
+  </div>
+
+  <p class="hint">💡 เกร็ดความรู้: ข้อมูลอย่าง ชื่อ-นามสกุล, เบอร์โทร, เลขบัตรประชาชน และอีเมล ถือเป็น PII ที่ต้องปิดบังก่อนเปิดเผยสาธารณะ</p>
+
+  <script>
+    // ข้อมูลเอกสาร 3 แผ่น (แต่ละแผ่นมีคำตอบ PII 3 ข้อซ้อนอยู่)
+    const documents = [
+      {
+        title: "📄 แผ่นที่ 1: สัญญาจ้างงานและแต่งตั้งตำแหน่ง",
+        words: [
+          { text: "หนังสือสัญญาฉบับนี้ทำขึ้นเพื่อรับรองว่า", isPII: false },
+          { text: "นายสมชาย ใจดี", isPII: true, label: "ชื่อ-นามสกุล" }, // PII ข้อที่ 1
+          { text: "ได้รับการบรรจุเข้าทำงานในตำแหน่ง นักวิเคราะห์ระบบ", isPII: false },
+          { text: "เริ่มงานตั้งแต่วันที่ 1 มกราคม โดยมีหมายเลขประจำตัวประชาชน", isPII: false },
+          { text: "1-1002-34567-89-0", isPII: true, label: "เลขบัตรประชาชน" }, // PII ข้อที่ 2
+          { text: "ปฏิบัติงาน ณ สำนักงานใหญ่ หากมีข้อสงสัยให้ติดต่อเบอร์", isPII: false },
+          { text: "081-234-5678", isPII: true, label: "เบอร์โทรศัพท์ส่วนตัว" }, // PII ข้อที่ 3
+          { text: "ในวันและเวลางานปกติ", isPII: false }
+        ]
+      },
+      {
+        title: "📑 แผ่นที่ 2: ใบเสร็จรับเงินบริการทางการแพทย์",
+        words: [
+          { text: "ใบเสร็จชำระเงินค่ารักษาพยาบาล ออกให้แก่ผู้ป่วย", isPII: false },
+          { text: "นางสาวมณี รักษ์ดี", isPII: true, label: "ชื่อ-นามสกุล" }, // PII ข้อที่ 1
+          { text: "เข้ารับบริการแผนกผู้ป่วยนอก ชำระเงินผ่านการโอนบัญชีธนาคาร", isPII: false },
+          { text: "เลขที่บัญชี 012-3-45678-9", isPII: true, label: "เลขบัญชีธนาคาร" }, // PII ข้อที่ 2
+          { text: "ยอดชำระรวม 1,500 บาท โดยเอกสารการตรวจสุขภาพและ", isPII: false },
+          { text: "ประวัติการแพ้ยาเสพติด", isPII: true, label: "ข้อมูลสุขภาพ/ประวัติทางการแพทย์ (Sensitive PII)" }, // PII ข้อที่ 3
+          { text: "จัดส่งให้ทางไปรษณีย์เรียบร้อยแล้ว", isPII: false }
+        ]
+      },
+      {
+        title: "✉️ แผ่นที่ 3: บันทึกข้อความแจ้งเตือนระบบ IT",
+        words: [
+          { text: "เรียนทีมงานทุกคน รายงานสรุปการเข้าใช้งานระบบประจำเดือน", isPII: false },
+          { text: "พบผู้ใช้งานล็อกอินผิดปกติคือผู้ใช้อีเมล", isPII: false },
+          { text: "user.secret@company.com", isPII: true, label: "อีเมลส่วนตัว/องค์กร" }, // PII ข้อที่ 1
+          { text: "เนื่องจากใช้เครื่องคอมพิวเตอร์หมายเลข IP Address", isPII: false },
+          { text: "192.168.1.45", isPII: true, label: "IP Address (ถือเป็น PII ทางเทคนิค)" }, // PII ข้อที่ 2
+          { text: "พยายามล็อกอินด้วยรหัสผ่านสำรองคือ", isPII: false },
+          { text: "P@ssw0rd2026", isPII: true, label: "รหัสผ่าน (Credentials)" }, // PII ข้อที่ 3
+          { text: "ขอให้ผู้ดูแลระบบทำการรีเซ็ตสิทธิ์ทันที", isPII: false }
+        ]
+      }
+    ];
+
+    let currentPaperIndex = 0;
+    let selectedIndices = new Set();
+    let totalScore = 0; // คะแนนสะสมถูกต้อง
+
+    const paperContent = document.getElementById('paper-content');
+    const paperNumText = document.getElementById('paper-num');
+    const countNumText = document.getElementById('count-num');
+    const submitBtn = document.getElementById('submit-btn');
+    const resultModal = document.getElementById('result-modal');
+    const resultTitle = document.getElementById('result-title');
+    const resultDesc = document.getElementById('result-desc');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // ฟังก์ชันแสดงเอกสารตาม Index
+    function renderPaper(index) {
+      selectedIndices.clear();
+      updateCountUI();
+
+      const doc = documents[index];
+      paperNumText.innerText = index + 1;
+
+      let html = `<div class="paper-title">${doc.title}</div>`;
+      
+      doc.words.forEach((wordObj, i) => {
+        html += `<span class="text-word" data-index="${i}">${wordObj.text}</span> `;
+      });
+
+      paperContent.innerHTML = html;
+
+      // เพิ่ม Event Listener สำหรับการคลิกคาดแถบดำ
+      document.querySelectorAll('.text-word').forEach(element => {
+        element.addEventListener('click', function() {
+          const wordIdx = parseInt(this.getAttribute('data-index'));
+          
+          if (selectedIndices.has(wordIdx)) {
+            selectedIndices.delete(wordIdx);
+            this.classList.remove('redacted');
+          } else {
+            selectedIndices.add(wordIdx);
+            this.classList.add('redacted');
+          }
+          updateCountUI();
+        });
+      });
+    }
+
+    // อัปเดตตัวเลขแถบดำที่เลือก
+    function updateCountUI() {
+      countNumText.innerText = selectedIndices.size;
+    }
+
+    // ตรวจผลของเอกสารแผ่นปัจจุบัน
+    function checkCurrentPaper() {
+      const currentDoc = documents[currentPaperIndex];
+      let piiIndices = [];
+      
+      currentDoc.words.forEach((w, idx) => {
+        if (w.isPII) piiIndices.push(idx);
+      });
+
+      // คำนวณความถูกต้อง
+      let correctInThisPaper = 0;
+      
+      // เช็กว่าเลือก PII ถูกต้องไหม
+      piiIndices.forEach(idx => {
+        if (selectedIndices.has(idx)) {
+          correctInThisPaper++;
+        }
+      });
+
+      // ถ้าเลือกคำที่ไม่ใช่ PII โดนหักคะแนน (Over-redacting)
+      selectedIndices.forEach(idx => {
+        if (!currentDoc.words[idx].isPII) {
+          correctInThisPaper = Math.max(0, correctInThisPaper - 0.5);
+        }
+      });
+
+      totalScore += correctInThisPaper;
+
+      // ไปยังแผ่นถัดไป หรือ จบเกม
+      currentPaperIndex++;
+      if (currentPaperIndex < documents.length) {
+        renderPaper(currentPaperIndex);
+      } else {
+        showFinalResult();
+      }
+    }
+
+    // แสดงหน้าต่างสรุปผลเมื่อครบ 3 แผ่น
+    function showFinalResult() {
+      const maxScore = 9; // 3 แผ่น x 3 ข้อ = 9 คะแนน
+      resultModal.classList.remove('hide');
+
+      if (totalScore >= 8) {
+        resultTitle.innerText = "🏆 Master Data Protection Officer!";
+        resultTitle.style.color = "var(--accent-green)";
+        resultDesc.innerHTML = `ยอดเยี่ยมมาก! คุณคาดแถบดำปิดบัง PII ได้ถูกต้องเป๊ะ<br>คะแนนของคุณ: <b style="color:var(--accent-green);">${totalScore}/${maxScore} คะแนน</b>`;
+      } else if (totalScore >= 5) {
+        resultTitle.innerText = "🔍 Data Inspector!";
+        resultTitle.style.color = "var(--accent-blue)";
+        resultDesc.innerHTML = `ทำได้ดี! แต่ยังมี PII บางจุดรอดสายตาไป หรือปิดทับคำทั่วไป<br>คะแนนของคุณ: <b style="color:var(--accent-blue);">${totalScore}/${maxScore} คะแนน</b>`;
+      } else {
+        resultTitle.innerText = "⚠️ เสี่ยงข้อมูลรั่วไหล! (Data Leak)";
+        resultTitle.style.color = "var(--accent-red)";
+        resultDesc.innerHTML = `คุณมองข้าม PII สำคัญหลายจุด อาจโดนโจมตีทาง Cyber Attack ได้<br>คะแนนของคุณ: <b style="color:var(--accent-red);">${totalScore}/${maxScore} คะแนน</b>`;
+      }
+    }
+
+    // รีสตาร์ทเกม
+    function restartGame() {
+      currentPaperIndex = 0;
+      totalScore = 0;
+      resultModal.classList.add('hide');
+      renderPaper(currentPaperIndex);
+    }
+
+    // Event Listeners
+    submitBtn.addEventListener('click', checkCurrentPaper);
+    restartBtn.addEventListener('click', restartGame);
+
+    // เริ่มเกมแผ่นแรก
+    renderPaper(0);
+  </script>
+</body>
+</html>
