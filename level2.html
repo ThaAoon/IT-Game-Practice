@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detector Simulator - SPU QUIZ MASTER</title>
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --glass-card: #1e293b;
+            --border-dark: rgba(255, 255, 255, 0.1);
+            --accent-purple: #a855f7;
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --email-white: #ffffff;
+            --text-gray: #94a3b8;
+        }
+
+        body { 
+            background-color: var(--bg-dark); 
+            color: #f1f5f9; 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            font-family: 'Kanit', sans-serif;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+        }
+
+        /* Top Bar / Navbar */
+        .navbar { 
+            background-color: rgba(30, 41, 59, 0.8) !important; 
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-dark); 
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-dark);
+            color: #94a3b8;
+            border-radius: 12px;
+            padding: 6px 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-back:hover {
+            color: #fff;
+            border-color: var(--accent-purple);
+            transform: translateX(-3px);
+        }
+
+        .brand-title {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(to right, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        /* Main Layout */
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+        /* Column 1: Narrative Sidebar */
+        .narrative-col { 
+            width: 320px; 
+            background: rgba(30, 41, 59, 0.6); 
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-dark); 
+            padding: 1.5rem; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .npc-box { 
+            background: rgba(15, 23, 42, 0.8); 
+            border-radius: 16px; 
+            padding: 1.25rem; 
+            border: 1px solid var(--border-dark); 
+        }
+
+        /* Column 2: Inbox List */
+        .inbox-col { 
+            width: 330px; 
+            background: var(--email-white); 
+            color: #1e293b;
+            border-right: 1px solid #e2e8f0; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        .email-item { 
+            padding: 1rem; 
+            border-bottom: 1px solid #f1f5f9; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        .email-item:hover { background-color: #f8fafc; }
+        .email-item.active { background-color: #f3e8ff; border-left: 4px solid var(--accent-purple); }
+        
+        .email-item.new-arrival {
+            animation: slideIn 0.5s ease-out forwards;
+            background-color: #e0f2fe;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Column 3: Email View Area */
+        .view-col { 
+            flex: 1; 
+            background: var(--bg-dark); 
+            display: flex; 
+            flex-direction: column; 
+            padding: 20px;
+        }
+
+        .email-container {
+            background: var(--email-white);
+            color: #1e293b;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .email-toolbar { 
+            background: #ffffff; 
+            border-bottom: 1px solid #e2e8f0; 
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .email-content-scroll { padding: 35px; overflow-y: auto; flex: 1; }
+
+        /* Buttons */
+        .btn-action-report { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; border: none; border-radius: 8px; padding: 6px 14px; font-weight: 600; }
+        .btn-action-report:hover { color: white; box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+        .btn-action-safe { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); color: white; border: none; border-radius: 8px; padding: 6px 14px; font-weight: 600; }
+        .btn-action-safe:hover { color: white; box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
+
+        .notification-toast {
+            position: absolute; top: 20px; right: 20px; z-index: 1050;
+            background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a;
+            padding: 12px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            display: flex; align-items: center; gap: 12px; font-weight: 600;
+            transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .notification-toast.show { transform: translateX(0); }
+        .red-flag-highlight { background-color: #fef08a; border: 2px dashed #eab308; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .btn-decorative { color: #94a3b8; pointer-events: none; opacity: 0.5; }
+        .modal-content { border: 1px solid var(--border-dark); border-radius: 20px; background: #1e293b; color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+<!-- Notification Toast -->
+<div id="new-mail-toast" class="notification-toast">
+    <i class="bi bi-bell-fill fs-4 text-dark"></i>
+    <div>
+        <div style="font-size: 0.8rem; opacity: 0.8;">แจ้งเตือนระบบ</div>
+        <div>📩 มีอีเมลใหม่ส่งเข้ามาใน Inbox!</div>
+    </div>
+</div>
+
+<!-- Header -->
+<nav class="navbar navbar-dark px-4 py-2">
+    <div class="d-flex align-items-center gap-3">
+        <a href="security_game.html" class="btn-back"><i class="bi bi-arrow-left me-2"></i> กลับหน้าหลัก</a>
+        <span class="navbar-brand mb-0 brand-title"><i class="bi bi-shield-exclamation text-purple me-2"></i>Phishing Simulator</span>
+    </div>
+    <div class="text-white">
+        <span class="fs-6 text-secondary me-2">คะแนนรวม:</span>
+        <span id="score-display" class="badge bg-purple fs-6 px-3 py-2" style="background: var(--accent-purple);">0</span>
+    </div>
+</nav>
+
+<div class="main-wrapper">
+    <!-- Col 1: Sidebar -->
+    <div class="narrative-col">
+        <div>
+            <div class="text-center mb-4">
+                <div style="font-size: 3.5rem;">🕵️‍♂️</div>
+                <h5 class="mt-2 fw-bold text-white">SOC Analyst Mentor</h5>
+                <span class="badge" style="background: rgba(168, 85, 247, 0.2); border: 1px solid var(--accent-purple); color: var(--accent-purple);">Cyber Guard HQ</span>
+            </div>
+            <div class="npc-box">
+                <p id="instruction-text" class="small mb-0 text-light" style="line-height: 1.6;">
+                    "วิเคราะห์ให้ดี! ระบบจำลองจะสุ่มอีเมลมาให้คุณตรวจสอบ ตัดสินใจว่าจะเป็น **'รายงาน Phishing'** หรือ **'ยืนยันว่าเป็นอีเมลจริง'** นะครับ"
+                </p>
+            </div>
+            <div id="status-update" class="mt-3 text-center text-info fw-bold small">
+                <i class="bi bi-radar me-1"></i> กำลังเชื่อมต่อเซิร์ฟเวอร์...
+            </div>
+        </div>
+        <div class="text-center text-secondary small">
+            <span>สถานการณ์ที่ <span id="current-scenario-num">1</span> / <span id="total-scenarios-num">5</span></span>
+        </div>
+    </div>
+
+    <!-- Col 2: Inbox -->
+    <div class="inbox-col">
+        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-inbox-fill text-primary me-2"></i>Inbox</span>
+            <span class="badge bg-light text-dark border" id="inbox-count">0 ข้อความ</span>
+        </div>
+        <div id="email-list-container" class="overflow-auto"></div>
+    </div>
+
+    <!-- Col 3: Email View -->
+    <div class="view-col">
+        <div class="email-container">
+            <div class="email-toolbar">
+                <button id="btn-report" class="btn btn-action-report btn-sm d-none" onclick="handleAction('report')">
+                    <i class="bi bi-flag-fill me-1"></i> รายงาน Phishing
+                </button>
+                <button id="btn-safe" class="btn btn-action-safe btn-sm d-none" onclick="handleAction('safe')">
+                    <i class="bi bi-shield-check me-1"></i> ยืนยันว่าเป็นอีเมลจริง
+                </button>
+                <button id="btn-delete" class="btn btn-outline-danger btn-sm d-none" onclick="handleAction('delete')">
+                    <i class="bi bi-trash me-1"></i> ลบอีเมล
+                </button>
+                <div style="width: 1px; height: 20px; background: #e2e8f0; margin: 0 5px;" class="d-none d-md-block"></div>
+                <i class="bi bi-reply btn-decorative ms-2 d-none d-md-inline"></i>
+                <i class="bi bi-forward btn-decorative ms-3 d-none d-md-inline"></i>
+            </div>
+            <div id="email-content-area" class="email-content-scroll">
+                <div class="text-center text-muted mt-5 py-5">
+                    <i class="bi bi-envelope-paper display-1 opacity-25"></i>
+                    <p class="mt-3 fs-5">รอรับอีเมลทดสอบระบบ...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Analysis -->
+<div class="modal fade" id="analysisModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-0 text-white" id="modal-header">
+                <h5 class="modal-title fw-bold" id="modal-title">รายงานการวิเคราะห์</h5>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-3" id="modal-icon" style="font-size: 3.5rem;"></div>
+                <h4 id="analysis-feedback" class="text-center fw-bold mb-4"></h4>
+                <div class="p-3 rounded-3" id="inspection-details" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-dark);">
+                    <h6 class="fw-bold text-warning mb-3" id="inspection-title"><i class="bi bi-search me-2"></i>จุดสังเกต (Inspection Details):</h6>
+                    <ul id="red-flags-list" class="mb-0 text-light small" style="line-height: 1.8;"></ul>
+                </div>
+            </div>
+            <div class="modal-footer border-0 d-flex justify-content-center gap-3" id="modal-footer-btns">
+                <button id="btn-next-scenario" type="button" class="btn btn-purple w-100 py-2 fw-bold" style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: white;" onclick="nextScenario()">
+                    ดำเนินงานต่อ <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // คลังข้อสอบทั้งหมด 9 ข้อ
+    const allScenarios = [
+        {
+            senderName: "Security Team Alert", senderEmail: "admin@verify-company-security.net",
+            subject: "⚠️ ด่วน! บัญชีของคุณถูกพยายามเข้าถึง", time: "10:42 AM", isPhishing: true,
+            body: `
+                <div class="mb-4">
+                    <h3 class="fw-bold text-danger mb-2">🚨 แจ้งเตือนความปลอดภัยระบบล็อกอิน</h3>
+                    <p class="text-muted mb-0">จาก: <b>Security Team</b> &lt;<span id="f1">admin@verify-company-security.net</span>&gt;</p>
+                </div>
+                <hr>
+                <p>เรียน คุณพนักงาน,</p>
+                <p>ระบบตรวจพบ <span id="f2">การล็อกอินจากประเทศรัสเซีย</span> กรุณาคลิกปุ่มด้านล่างเพื่อ <b>"ยืนยันตัวตน"</b> ทันที:</p>
+                <div class="text-center my-4">
+                    <a href="javascript:void(0)" class="btn btn-danger px-5 py-3 fw-bold" onclick="handleAction('click-link')" id="f3">ยืนยันตัวตนทันที</a>
+                </div>
+                <p class="text-muted small">*หากไม่ดำเนินการใน 10 นาที <span id="f4">ระบบจะทำการล็อกบัญชีถาวร</span></p>
+            `,
+            flags: ["<b>Domain ปลอม:</b> ใช้ @verify-company-security.net", "<b>สร้างความกลัว (Fear):</b> ขู่ล็อกบัญชีถาวร", "<b>ปุ่มอันตราย:</b> หลอกให้คลิกไปหน้าล็อกอินปลอม"]
+        },
+        {
+            senderName: "HR Department", senderEmail: "hr@company.com",
+            subject: "กำหนดการอบรม Cyber Security 2026", time: "09:15 AM", isPhishing: false,
+            body: `
+                <div class="mb-4">
+                    <h3 class="fw-bold text-dark mb-2">กำหนดการอบรมไซเบอร์ประจำปี</h3>
+                    <p class="text-muted mb-0">จาก: <b>HR Department</b> &lt;hr@company.com&gt;</p>
+                </div>
+                <hr>
+                <p>เรียน พนักงานทุกท่าน,</p>
+                <p>ขอเชิญเข้าร่วมการอบรมตระหนักรู้ด้านความปลอดภัยไซเบอร์ประจำปี ในวันศุกร์นี้ เวลา 10:00 - 11:30 น.</p>
+                <p>ท่านสามารถดูรายละเอียดและลิงก์ห้องประชุมได้ที่ <b>ระบบ Intranet ภายใน</b> ของบริษัทตามปกติครับ</p>
+                <p class="text-muted mt-4">ขอบคุณครับ<br>ฝ่ายทรัพยากรบุคคล</p>
+            `,
+            flags: ["<b>อีเมลถูกต้อง:</b> ส่งจากโดเมนบริษัทจริง", "<b>ไม่มีลิงก์อันตราย:</b> แนะนำให้เข้าผ่าน Intranet ตามปกติ", "<b>ไม่มีการเร่งรัด:</b> เป็นเพียงอีเมลประกาศข่าวสาร"]
+        },
+        {
+            senderName: "IT Cloud Support", senderEmail: "support-mailbox-update@gmail.com",
+            subject: "พื้นที่อีเมลเต็ม! อัปเกรดฟรี 50GB", time: "Just Now", isPhishing: true,
+            body: `
+                <div class="mb-4">
+                    <h3 class="fw-bold text-warning mb-2">⚠️ Mailbox Quota Exceeded (99%)</h3>
+                    <p class="text-muted mb-0">จาก: <b>IT Cloud</b> &lt;<span id="f1">support-mailbox-update@gmail.com</span>&gt;</p>
+                </div>
+                <hr>
+                <p>ขณะนี้พื้นที่จัดเก็บข้อมูลของคุณใช้งานไปแล้ว <span id="f2">99.8%</span></p>
+                <p>กดที่ลิงก์ด้านล่างเพื่อขยายความจุฟรีเพิ่มอีก 50GB:</p>
+                <div class="my-3 p-3 bg-light rounded text-center">
+                    👉 <a href="javascript:void(0)" class="fw-bold text-primary" onclick="handleAction('click-link')" id="f3">https://bit.ly/3xX9-upgrade</a>
+                </div>
+            `,
+            flags: ["<b>ใช้อีเมลสาธารณะ:</b> ฝ่าย IT จะไม่ใช้ @gmail.com", "<b>ลิงก์ย่อ:</b> ใช้ bit.ly ปิดบัง URL จริง", "<b>อ้างพื้นที่เต็ม:</b> มุกคลาสสิกของ Phishing"]
+        },
+        {
+            senderName: "CEO Office", senderEmail: "ceo.director-office@yahoo.com",
+            subject: "ด่วน! รบกวนซื้อ Gift Card ให้ลูกค้า VIP", time: "11:00 AM", isPhishing: true,
+            body: `
+                <div class="mb-4">
+                    <h3 class="fw-bold text-dark mb-2">Confidential: จัดการธุระด่วน</h3>
+                    <p class="text-muted mb-0">จาก: <b>สมศักดิ์ (CEO)</b> &lt;<span id="f1">ceo.director-office@yahoo.com</span>&gt;</p>
+                </div>
+                <hr>
+                <p>คุณว่างอยู่ไหม? <span id="f2">ผมกำลังประชุมสำคัญ คุยโทรศัพท์ไม่ได้</span></p>
+                <p>รบกวนช่วยไปซื้อ <b>Apple Gift Card มูลค่า 5,000 บาท จำนวน 3 ใบ</b> เพื่อมอบให้ลูกค้า VIP ด่วน</p>
+                <p>ซื้อเสร็จแล้ว <span id="f3">ถ่ายรูปเลขรหัสส่งกลับมาในอีเมลนี้เลย</span> เดี๋ยวผมให้ฝ่ายบัญชีเบิกคืนให้ตอนเย็น</p>
+                <div class="text-center my-4">
+                    <button class="btn btn-outline-primary px-4" onclick="handleAction('click-link')" id="f4">ตอบกลับพร้อมแนบรูปภาพ</button>
+                </div>
+            `,
+            flags: ["<b>CEO Fraud:</b> แอบอ้างเป็นผู้บริหารใช้อีเมลส่วนตัว (@yahoo.com)", "<b>อ้างว่าประชุมอยู่:</b> ป้องกันไม่ให้เหยื่อโทรไปยืนยันตัวตน", "<b>ขอให้ซื้อ Gift Card:</b> รูปแบบหลอกลวงยอดฮิต (แก๊งคอลเซ็นเตอร์/สแกมเมอร์)"]
+        },
+        {
+            senderName: "IT Operations", senderEmail: "it-ops@company.com",
+            subject: "แจ้งปิดปรับปรุงเซิร์ฟเวอร์ระบบบัญชี", time: "08:30 AM", isPhishing: false,
+            body: `
+                <div class="mb-4">
+                    <h3 class="fw-bold text-dark mb-2">🔧 Maintenance Notice</h3>
+                    <p class="text-muted mb-0">จาก: <b>IT Operations</b> &lt;it-ops@company.com&gt;</p>
+                </div>
+                <hr>
+                <p>เรียน ผู้ใช้งานระบบบัญชี ERP,</p>
+                <p>ฝ่าย IT ขอแจ้งกำหนดการปิดปรับปรุงเซิร์ฟเวอร์ประจำเดือน ใน <b>คืนวันเสาร์ที่ 15 ตั้งแต่เวลา 23:00 - 02:00 น.</b></p>
+                <p>ในช่วงเวลาดังกล่าวจะไม่สามารถเข้าใช้งานระบบบัญชีได้ ขออภัยในความไม่สะดวกครับ</p>
+            `,
+            flags: ["<b>ผู้ส่งจริง:</b> ใช้อีเมลภายในบริษัท @company.com", "<b>แจ้งเพื่อทราบเท่านั้น:</b> ไม่มีการบังคับให้กดลิงก์หรือกรอกข้อมูล", "<b>ภาษาเป็นทางการ:</b> รูปแบบประกาศมาตรฐาน"]
+        },
+        {
+            senderName: "ThaiPost Tracking", senderEmail: "alert@thaipost-delivery-center.com",
+            subject: "พัสดุของคุณจัดส่งไม่สำเร็จ - ค้างชำระค่าธรรมเนียม", time: "02:15 PM", isPhishing: true,
+            body: `
+                <div class="mb-4">
+                    <h3 class="fw-bold text-danger mb-2">📦 การจัดส่งพัสดุผิดพลาด</h3>
+                    <p class="text-muted mb-0">จาก: <b>ไปรษณีย์ไทย</b> &lt;<span id="f1">alert@thaipost-delivery-center.com</span>&gt;</p>
+                </div>
+                <hr>
+                <p>เรียน ลูกค้า,</p>
+                <p>พัสดุหมายเลข <b>TH8832910X</b> ของคุณไม่สามารถจัดส่งได้เนื่องจาก <span id="f2">ค้างชำระค่าธรรมเนียมศุลกากร 35 บาท</span></p>
+                <p>กรุณาชำระเงินและอัปเดตที่อยู่ภายใน 24 ชั่วโมง:</p>
+                <div class="text-center my-4">
+                    <a href="javascript:void(0)" class="btn btn-warning px-5 py-3 fw-bold shadow" onclick="handleAction('click-link')" id="f3">ชำระค่าธรรมเนียม 35 บาท</a>
+                </div>
+            `,
+            flags: ["<b>อีเมลปลอม:</b> ไม่ใช่โดเมนของไปรษณีย์ไทยจริง (thaipost.co.th)", "<b>หลอกเก็บเงินจำนวนน้อย:</b> ทำให้เหยื่อตายใจยอมจ่ายเงิน แต่ความจริงคือการดักรหัสบัตรเครดิต", "<b>กดดันเรื่องเวลา:</b> ให้รีบทำภายใน 24 ชม."]
+        },
+        {
+            senderName: "Somchai (Team Lead)", senderEmail: "somchai.t@company.com",
+            subject: "แชร์ไฟล์: สรุปยอดขาย Q3_2026.xlsx", time: "04:00 PM", isPhishing: false,
+            body: `
+                <div class="mb-4">
+                    <h3 class="fw-bold text-dark mb-2">📊 ไฟล์สรุปยอดขายรายไตรมาส</h3>
+                    <p class="text-muted mb-0">จาก: <b>สมชาย (Team Lead)</b> &lt;somchai.t@company.com&gt;</p>
+                </div>
+                <hr>
+                <p>สวัสดีทุกคน,</p>
+                <p>พี่ส่งไฟล์ Excel สรุปยอดขายของไตรมาส 3 เข้าไปในโฟลเดอร์แชร์ของแผนกแล้วนะครับ รบกวนเข้าไปรีวิวตัวเลขก่อนประชุมวันพรุ่งนี้ด้วยครับ</p>
+                <p><i>*เข้าผ่าน SharePoint ของทีมได้เลย ไม่ต้องโหลดไฟล์ลงเครื่องครับ</i></p>
+            `,
+            flags: ["<b>ผู้ส่งคุ้นเคย:</b> ส่งจากอีเมลของหัวหน้างานจริง", "<b>ไม่มีไฟล์แนบอันตราย:</b> ให้เข้าไปดูในพื้นที่ทำงานร่วมกัน (SharePoint)", "<b>บริบทสมเหตุสมผล:</b> เนื้อหาสอดคล้องกับการทำงานปกติ"]
+        },
+        {
+            senderName: "Microsoft 365 Admin", senderEmail: "admin@ms-office-auth-update.net",
+            subject: "Action Required: รหัสผ่านของคุณกำลังจะหมดอายุ", time: "Yesterday", isPhishing: true,
+            body: `
+                <div class="mb-4">
+                    <h3 class="fw-bold text-dark mb-2">🔒 Microsoft 365 Security Alert</h3>
+                    <p class="text-muted mb-0">จาก: <b>IT Admin</b> &lt;<span id="f1">admin@ms-office-auth-update.net</span>&gt;</p>
+                </div>
+                <hr>
+                <p>รหัสผ่านอีเมลองค์กรของคุณ <span id="f2">จะหมดอายุในอีก 24 ชั่วโมงข้างหน้า</span></p>
+                <p>คุณสามารถเลือกรักษารหัสผ่านเดิมไว้ได้ โดยคลิกที่ปุ่มด้านล่างเพื่อทำรายการ:</p>
+                <div class="text-center my-4">
+                    <a href="javascript:void(0)" class="btn btn-dark px-5 py-3 fw-bold" onclick="handleAction('click-link')" id="f3">Keep Same Password (รักษารหัสเดิม)</a>
+                </div>
+            `,
+            flags: ["<b>โดเมนแอบอ้าง:</b> ปลอมเป็นระบบ Microsoft", "<b>ใช้ความสะดวกเข้าล่อ:</b> เสนอทางเลือก 'รักษารหัสเดิม' เพื่อให้คนขี้เกียจเปลี่ยนรหัสเผลอกด", "<b>ปุ่มดักข้อมูล:</b> เมื่อกดจะพาไปหน้ากรอกรหัสผ่านเพื่อขโมยบัญชี"]
+        },
+        {
+            senderName: "Finance Accounts", senderEmail: "billing@accounting-services-online.com",
+            subject: "ใบแจ้งหนี้ค้างชำระ (Overdue) #INV-2026-004", time: "09:00 AM", isPhishing: true,
+            body: `
+                <div class="mb-4">
+                    <h3 class="fw-bold text-danger mb-2">📄 ใบแจ้งหนี้ค้างชำระ</h3>
+                    <p class="text-muted mb-0">จาก: <b>Accounts Payable</b> &lt;<span id="f1">billing@accounting-services-online.com</span>&gt;</p>
+                </div>
+                <hr>
+                <p>เรียน ฝ่ายบัญชี,</p>
+                <p>บริษัทของเรายังไม่ได้รับการชำระเงินสำหรับรอบบิลที่ผ่านมา <span id="f2">กรุณาตรวจสอบใบแจ้งหนี้ที่แนบมา และดำเนินการชำระเงินโดยด่วนเพื่อหลีกเลี่ยงค่าปรับ</span></p>
+                <div class="p-3 border rounded bg-light my-3 d-inline-block">
+                    <i class="bi bi-file-earmark-pdf-fill text-danger fs-4 me-2"></i>
+                    <a href="javascript:void(0)" class="fw-bold text-decoration-none" onclick="handleAction('click-link')" id="f3">Invoice_Overdue_2026.pdf.exe</a>
+                </div>
+            `,
+            flags: ["<b>ผู้ส่งภายนอกแปลกปลอม:</b> อีเมลจากโดเมนที่ไม่รู้จัก", "<b>เร่งให้จ่ายเงิน:</b> อ้างเรื่องค่าปรับเพื่อกดดัน", "<b>ไฟล์แนบซ่อนไวรัส:</b> สังเกตนามสกุลไฟล์เป็น .pdf.exe (สคริปต์รันไวรัส/มัลแวร์)"]
+        }
+    ];
+
+    let gameScenarios = [];
+    let currentScenarioIndex = 0;
+    let totalScore = 0;
+    let correctAnswersCount = 0; // ตัวแปรสำหรับนับข้อที่ตอบถูก
+    const MAX_ROUNDS = 5; 
+    const modal = new bootstrap.Modal(document.getElementById('analysisModal'));
+
+    function shuffleArray(array) {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function initGame() {
+        gameScenarios = shuffleArray(allScenarios).slice(0, MAX_ROUNDS);
+        currentScenarioIndex = 0;
+        totalScore = 0;
+        correctAnswersCount = 0;
+        document.getElementById('total-scenarios-num').innerText = MAX_ROUNDS;
+        document.getElementById('score-display').innerText = totalScore;
+        loadScenario();
+    }
+
+    function loadScenario() {
+        document.getElementById('current-scenario-num').innerText = currentScenarioIndex + 1;
+        document.getElementById('status-update').innerHTML = `<i class="bi bi-arrow-repeat spin me-1"></i> กำลังรออีเมลฉบับใหม่...`;
+        
+        document.getElementById('inbox-count').innerText = "0 ข้อความ";
+        document.getElementById('email-list-container').innerHTML = "";
+        document.getElementById('email-content-area').innerHTML = `
+            <div class="text-center text-muted mt-5 py-5">
+                <i class="bi bi-hourglass-split display-1 opacity-25"></i>
+                <p class="mt-3 fs-5">กำลังรออีเมลทดสอบเข้าสู่กล่องข้อความ...</p>
+            </div>
+        `;
+        
+        document.getElementById('btn-report').classList.add('d-none');
+        document.getElementById('btn-safe').classList.add('d-none');
+        document.getElementById('btn-delete').classList.add('d-none');
+
+        setTimeout(() => triggerNewMailArrival(), 1200);
+    }
+
+    function triggerNewMailArrival() {
+        const scenario = gameScenarios[currentScenarioIndex];
+        
+        const toast = document.getElementById('new-mail-toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+
+        document.getElementById('status-update').innerHTML = `<i class="bi bi-exclamation-circle-fill text-warning me-1"></i> พบบางอย่างส่งเข้ามา!`;
+        document.getElementById('inbox-count').innerText = "1 ข้อความ";
+
+        const list = document.getElementById('email-list-container');
+        list.innerHTML = `
+            <div class="email-item new-arrival" onclick="showEmailDetails(this)">
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="small fw-bold text-truncate">${scenario.senderName}</span>
+                    <span class="text-purple small fw-bold">${scenario.time}</span>
+                </div>
+                <div class="small text-dark fw-semibold text-truncate">${scenario.subject}</div>
+            </div>
+        `;
+    }
+
+    function showEmailDetails(element) {
+        const scenario = gameScenarios[currentScenarioIndex];
+        if(element) {
+            element.classList.remove('new-arrival');
+            element.classList.add('active');
+        }
+
+        document.getElementById('btn-report').classList.remove('d-none');
+        document.getElementById('btn-safe').classList.remove('d-none');
+        document.getElementById('btn-delete').classList.remove('d-none');
+        document.getElementById('email-content-area').innerHTML = scenario.body;
+    }
+
+    function handleAction(type) {
+        const scenario = gameScenarios[currentScenarioIndex];
+        const header = document.getElementById('modal-header');
+        const feedback = document.getElementById('analysis-feedback');
+        const list = document.getElementById('red-flags-list');
+        const icon = document.getElementById('modal-icon');
+        
+        // Reset Modal UI for standard feedback
+        document.getElementById('modal-title').innerText = "รายงานการวิเคราะห์";
+        document.getElementById('inspection-title').innerHTML = `<i class="bi bi-search me-2"></i>จุดสังเกต (Inspection Details):`;
+        list.innerHTML = "";
+
+        // Highlight Red Flags
+        ['f1', 'f2', 'f3', 'f4'].forEach(id => {
+            if(document.getElementById(id)) document.getElementById(id).classList.add('red-flag-highlight');
+        });
+
+        if(type === 'report') {
+            if(scenario.isPhishing) {
+                totalScore += 100;
+                correctAnswersCount++; // ตอบถูก
+                header.className = "modal-header border-0 bg-success text-white";
+                icon.innerText = "🏆";
+                feedback.innerText = "วิเคราะห์ถูกต้อง! รายงาน Phishing สำเร็จ";
+                feedback.className = "text-center fw-bold mb-4 text-success";
+            } else {
+                totalScore -= 20;
+                header.className = "modal-header border-0 bg-warning text-dark";
+                icon.innerText = "⚠️";
+                feedback.innerText = "แจ้งเตือนผิดพลาด! นี่คืออีเมลจริงและปลอดภัย";
+                feedback.className = "text-center fw-bold mb-4 text-warning";
+            }
+        } else if(type === 'safe') {
+            if(!scenario.isPhishing) {
+                totalScore += 100;
+                correctAnswersCount++; // ตอบถูก
+                header.className = "modal-header border-0 bg-success text-white";
+                icon.innerText = "✅";
+                feedback.innerText = "วิเคราะห์ถูกต้อง! นี่คืออีเมลปกติ";
+                feedback.className = "text-center fw-bold mb-4 text-success";
+            } else {
+                totalScore -= 50;
+                header.className = "modal-header border-0 bg-danger text-white";
+                icon.innerText = "❌";
+                feedback.innerText = "อันตรายมาก! คุณยืนยันให้ Phishing ผ่านระบบ";
+                feedback.className = "text-center fw-bold mb-4 text-danger";
+            }
+        } else if(type === 'delete') {
+            if(scenario.isPhishing) {
+                totalScore += 40;
+                header.className = "modal-header border-0 bg-info text-white";
+                icon.innerText = "🗑️";
+                feedback.innerText = "ปลอดภัย! แต่การ 'รายงาน Phishing' จะปกป้องเพื่อนร่วมงานได้ดีกว่า";
+                feedback.className = "text-center fw-bold mb-4 text-info";
+            } else {
+                totalScore += 10;
+                header.className = "modal-header border-0 bg-secondary text-white";
+                icon.innerText = "📥";
+                feedback.innerText = "ลบอีเมลข่าวสารทั่วไปแล้ว";
+                feedback.className = "text-center fw-bold mb-4 text-light";
+            }
+        } else if(type === 'click-link') {
+            totalScore -= 100;
+            header.className = "modal-header border-0 bg-danger text-white";
+            icon.innerText = "💀";
+            feedback.innerText = "คุณตกเป็นเหยื่อแล้ว! การคลิกคือเป้าหมายของแฮกเกอร์";
+            feedback.className = "text-center fw-bold mb-4 text-danger";
+        }
+
+        scenario.flags.forEach(f => {
+            const li = document.createElement('li');
+            li.className = "mb-2";
+            li.innerHTML = f;
+            list.appendChild(li);
+        });
+
+        document.getElementById('score-display').innerText = totalScore;
+        
+        document.getElementById('modal-footer-btns').innerHTML = `
+            <button type="button" class="btn btn-purple w-100 py-2 fw-bold" style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: white;" onclick="nextScenario()">
+                ดำเนินงานต่อ <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+        `;
+        modal.show();
+    }
+
+    function nextScenario() {
+        modal.hide();
+        currentScenarioIndex++;
+        if(currentScenarioIndex < gameScenarios.length) {
+            loadScenario();
+        } else {
+            // เมื่อครบ 5 ข้อให้แสดง Popup สรุปผล
+            setTimeout(() => showFinalSummary(), 400); // ดีเลย์เล็กน้อยให้ Modal เก่าปิดสนิทก่อน
+        }
+    }
+
+    function showFinalSummary() {
+        const header = document.getElementById('modal-header');
+        const title = document.getElementById('modal-title');
+        const feedback = document.getElementById('analysis-feedback');
+        const list = document.getElementById('red-flags-list');
+        const icon = document.getElementById('modal-icon');
+        const footerBtns = document.getElementById('modal-footer-btns');
+        const inspectionTitle = document.getElementById('inspection-title');
+
+        header.className = "modal-header border-0 bg-purple text-white";
+        title.innerText = "ผลประเมินทักษะของคุณ";
+        
+        let rankTitle = "";
+        let textColor = "";
+
+        if (correctAnswersCount === MAX_ROUNDS) {
+            icon.innerText = "🎖️";
+            rankTitle = "ระดับ: Phishing Defense Expert (ตอบถูกทั้งหมด!)";
+            textColor = "text-success";
+        } else if (correctAnswersCount >= 3) {
+            icon.innerText = "🛡️";
+            rankTitle = "ระดับ: Cyber Watcher (ผ่านเกณฑ์แบบปลอดภัย)";
+            textColor = "text-info";
+        } else {
+            icon.innerText = "⚠️";
+            rankTitle = "ระดับ: Need Improvement (ยังต้องฝึกฝนเพิ่มเติม)";
+            textColor = "text-warning";
+        }
+
+        // แสดงจำนวนข้อที่ตอบถูก
+        feedback.innerHTML = `
+            <div class="display-6 mb-2">คุณตอบถูก <span class="${textColor} fw-bold fs-1">${correctAnswersCount}</span> / ${MAX_ROUNDS} ข้อ</div>
+            <div class="fs-5 text-light fw-normal">คะแนนรวมทั้งหมด: ${totalScore} คะแนน</div>
+        `;
+        feedback.className = "text-center fw-bold mb-4";
+
+        inspectionTitle.innerHTML = `<i class="bi bi-person-check me-2"></i>สรุปผลการวิเคราะห์:`;
+        list.innerHTML = `
+            <li class="mb-3 fs-5 ${textColor}"><b>${rankTitle}</b></li>
+            <li class="mb-2" style="font-size: 1.05rem;">การฝึกฝนวิเคราะห์อีเมลจำลองจะช่วยให้คุณสามารถสังเกตโดเมนแปลกปลอม, ลิงก์ย่อ, และไฟล์แนบอันตรายได้แม่นยำยิ่งขึ้นในชีวิตจริง</li>
+        `;
+
+        // สร้างปุ่มเล่นซ้ำ และกลับหน้าหลัก แบบเรียงซ้ายขวา
+        footerBtns.innerHTML = `
+            <button class="btn btn-outline-light px-4 py-2 fw-bold w-50" style="border-radius: 12px;" onclick="restartGame()">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> เล่นซ้ำอีกครั้ง
+            </button>
+            <a href="security_game.html" class="btn btn-purple px-4 py-2 fw-bold w-50" style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; border-radius: 12px;">
+                <i class="bi bi-house-door-fill me-1"></i> กลับไปหน้าหลัก
+            </a>
+        `;
+        modal.show();
+    }
+
+    function restartGame() {
+        modal.hide();
+        initGame();
+    }
+
+    // Start Game on Load
+    window.onload = initGame;
+</script>
+
+</body>
+</html>

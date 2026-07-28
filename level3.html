@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Inspector - Interactive Desk Scene</title>
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --glass-card: rgba(30, 41, 59, 0.85);
+            --border-dark: rgba(255, 255, 255, 0.15);
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-yellow: #facc15;
+        }
+
+        body { 
+            background-color: var(--bg-dark); 
+            color: #f1f5f9; 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            font-family: 'Kanit', sans-serif;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+        }
+
+        /* Top Bar */
+        .navbar { 
+            background-color: rgba(30, 41, 59, 0.9) !important; 
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-dark); 
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-dark);
+            color: #94a3b8;
+            border-radius: 12px;
+            padding: 6px 16px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-back:hover { color: #fff; border-color: var(--accent-blue); transform: translateX(-3px); }
+
+        .brand-title {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(to right, #38bdf8, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        /* Main Layout */
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+        /* Sidebar */
+        .narrative-col { 
+            width: 320px; 
+            background: rgba(30, 41, 59, 0.7); 
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-dark); 
+            padding: 1.5rem; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .npc-box { 
+            background: rgba(15, 23, 42, 0.9); 
+            border-radius: 16px; 
+            padding: 1.25rem; 
+            border: 1px solid var(--border-dark); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Scene Area with Realistic Desk Image */
+        .view-col { 
+            flex: 1; 
+            background: #090d16;
+            display: flex; 
+            flex-direction: column; 
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .room-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16 / 9;
+            background: url('https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1200&auto=format&fit=crop') center/cover no-repeat;
+            border-radius: 16px;
+            border: 2px solid var(--border-dark);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+
+        .room-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.35); /* ทำให้ภาพเข้มขึ้นเล็กน้อยเพื่อให้ปุ่มเด่นชัด */
+            backdrop-filter: brightness(0.9);
+        }
+
+        /* Hotspot Pins on Desk */
+        .hotspot {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(56, 189, 248, 0.85);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f172a;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+            animation: pulse-ring 2s infinite;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .hotspot:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            background: var(--accent-yellow);
+            color: #000;
+        }
+
+        .hotspot.checked {
+            background: var(--accent-green);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.8);
+            animation: none;
+            pointer-events: none;
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.6); }
+            70% { box-shadow: 0 0 0 12px rgba(56, 189, 248, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+        }
+
+        /* Tracker */
+        .progress-tracker {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .tracker-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid var(--border-dark);
+        }
+        .tracker-dot.active { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+
+        /* Modal */
+        .modal-content { border: 1px solid var(--border-dark); border-radius: 20px; background: #1e293b; color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<nav class="navbar navbar-dark px-4 py-2">
+    <div class="d-flex align-items-center gap-3">
+        <a href="security_game.html" class="btn-back">
+            <i class="bi bi-arrow-left me-2"></i> หน้าหลัก
+        </a>
+        <span class="navbar-brand mb-0 brand-title">
+            <i class="bi bi-display me-2"></i>Interactive Desk Inspector
+        </span>
+    </div>
+    <div class="text-white">
+        <span class="fs-6 text-secondary me-2">คะแนนรวม:</span>
+        <span id="score-display" class="badge fs-6 px-3 py-2" style="background: var(--accent-blue);">0</span>
+    </div>
+</nav>
+
+<div class="main-wrapper">
+    
+    <!-- Sidebar -->
+    <div class="narrative-col">
+        <div>
+            <div class="text-center mb-3">
+                <div style="font-size: 3rem;">🕵️‍♂️</div>
+                <h5 class="mt-2 fw-bold text-white">Privacy Inspector</h5>
+                <span class="badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid var(--accent-blue); color: var(--accent-blue);">PII & Security</span>
+            </div>
+            <div class="npc-box">
+                <p id="instruction-text" class="small mb-0 text-light" style="line-height: 1.5;">
+                    "ยินดีต้อนรับสู่การตรวจสอบพื้นที่จริง! มองหาจุดที่มีการซ่อนข้อมูลส่วนบุคคล (PII) หรือความเสี่ยงด้านความปลอดภัยบนโต๊ะทำงาน แล้วคลิกที่หมุดสัญญาณให้ครบถ้วน"
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <div class="text-center text-secondary small mb-1">ความคืบหน้าสถานการณ์นี้:</div>
+            <div class="progress-tracker" id="risk-tracker"></div>
+        </div>
+        <div class="text-center text-muted small">
+            สถานการณ์ที่ <span id="current-scenario-num" class="text-white fw-bold">1</span> / 3
+        </div>
+    </div>
+
+    <!-- Scene Interactive Room -->
+    <div class="view-col">
+        <div class="w-100 max-w-900 mb-2 px-2 d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="fw-bold text-white mb-0" id="scene-title">โหลดสถานที่...</h4>
+                <p class="text-info small mb-0" id="scene-desc">คลิกที่จุดไอคอนบนภาพเพื่อตรวจสอบความปลอดภัย</p>
+            </div>
+        </div>
+
+        <!-- Room Container with Background Image & Hotspots -->
+        <div class="room-container" id="room-container">
+            <div class="room-overlay"></div>
+            <!-- Hotspots injected dynamically via JS -->
+            <div id="hotspots-layer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Feedback -->
+<div class="modal fade" id="feedbackModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-0 text-white" id="modal-header">
+                <h5 class="modal-title fw-bold" id="modal-title">ผลการตรวจสอบ</h5>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div id="modal-icon" style="font-size: 4rem; margin-bottom: 10px;"></div>
+                <h4 id="feedback-title" class="fw-bold mb-3"></h4>
+                <p id="feedback-desc" class="text-light" style="font-size: 1.05rem; line-height: 1.6;"></p>
+            </div>
+            <div class="modal-footer border-0 d-flex justify-content-center" id="modal-footer-btns">
+                <button type="button" class="btn btn-outline-light px-4 py-2" data-bs-dismiss="modal">รับทราบ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // 3 สถานการณ์จำลองสถานที่จริง พร้อมตำแหน่งพิกัดเปอร์เซ็นต์บนภาพ (X, Y)
+    const scenarios = [
+        {
+            title: "🏢 สถานการณ์ที่ 1: โต๊ะทำงานออฟฟิศ (Office Desk)",
+            description: "สำรวจโต๊ะทำงาน ค้นหา 3 จุดเสี่ยงข้อมูล PII และความปลอดภัย",
+            bgImage: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1200&auto=format&fit=crop",
+            targetRisks: 3,
+            items: [
+                { id: 'd1', name: 'โพสต์อิทรหัสผ่านหน้าจอ', x: 28, y: 42, icon: 'bi-sticky', isRisk: true, exp: 'เสี่ยงมาก! การจดรหัสผ่านแปะไว้หน้าจอทำให้ใครก็เข้าถึงระบบได้' },
+                { id: 'd2', name: 'แฟ้มประวัติลูกค้าเปิดทิ้งไว้', x: 72, y: 65, icon: 'bi-folder2-open', isRisk: true, exp: 'ข้อมูล PII รั่วไหล! เอกสารข้อมูลส่วนบุคคลลูกค้าวางไว้บนโต๊ะโดยไม่มีการล็อกเกอร์เก็บ' },
+                { id: 'd3', name: 'แก้วกาแฟบนโต๊ะ', x: 55, y: 80, icon: 'bi-cup-hot', isRisk: false, exp: 'แก้วกาแฟส่วนตัว ปลอดภัยดี ไม่มีผลกระทบต่อความมั่นคงปลอดภัย' },
+                { id: 'd4', name: 'สมาร์ทโฟนวางคว่ำไม่ล็อกจอ', x: 42, y: 55, icon: 'bi-phone', isRisk: true, exp: 'อันตราย! มือถือไม่ตั้งล็อกหน้าจอ เสี่ยงต่อการถูกแอบดูแชทงานและแอปธนาคาร' },
+                { id: 'd5', name: 'กระถางต้นไม้ตกแต่ง', x: 85, y: 45, icon: 'bi-flower1', isRisk: false, exp: 'ต้นไม้ตกแต่งโต๊ะทำงาน ช่วยเพิ่มบรรยากาศ ปลอดภัยไร้กังวล' }
+            ]
+        },
+        {
+            title: "💻 สถานการณ์ที่ 2: หน้าจอคอมพิวเตอร์ (Computer & Work Screen)",
+            description: "ตรวจสอบความปลอดภัยบนหน้าจอและรอบๆ อุปกรณ์คอมพิวเตอร์ หาจุดเสี่ยง 3 จุด",
+            bgImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1200&auto=format&fit=crop",
+            targetRisks: 3,
+            items: [
+                { id: 's1', name: 'หน้าต่างแชทลับเปิดคาไว้', x: 30, y: 35, icon: 'bi-chat-square-text', isRisk: true, exp: 'เสี่ยงถูกแอบมอง (Shoulder Surfing) ข้อมูลทางธุรกิจสำคัญหลุดรั่ว' },
+                { id: 's2', name: 'ไฟล์งานโปรเจกต์หลัก', x: 50, y: 50, icon: 'bi-file-earmark-code', isRisk: false, exp: 'เปิดไฟล์งานเพื่อปฏิบัติหน้าที่ตามปกติ ไม่มีปัญหาความปลอดภัย' },
+                { id: 's3', name: 'โปรแกรมเถื่อนดาวน์โหลดค้างไว้', x: 65, y: 40, icon: 'bi-exclamation-triangle', isRisk: true, exp: 'อันตราย! ซอฟต์แวร์นอกเหนือจากนโยบายไอทีเสี่ยงติดมัลแวร์และแรนซัมแวร์' },
+                { id: 's4', name: 'สถานะระบบไม่ได้ล็อกจอ', x: 20, y: 60, icon: 'bi-unlock', isRisk: true, exp: 'เมื่อลุกจากโต๊ะต้องกดล็อกหน้าจอทุกครั้ง ป้องกันคนอื่นมาแอบสวมรอยใช้งาน' },
+                { id: 's5', name: 'วอลเปเปอร์หน้าจอ', x: 80, y: 30, icon: 'bi-image', isRisk: false, exp: 'ภาพพื้นหลังทั่วไป ปลอดภัยไม่มีความเสี่ยงด้าน PII' }
+            ]
+        },
+        {
+            title: "📱 สถานการณ์ที่ 3: โซนมือถือและอุปกรณ์พกพา (Mobile & Personal Area)",
+            description: "ตรวจสอบพฤติกรรมการใช้งานมือถือและการเชื่อมต่อไร้สาย หาจุดเสี่ยง 3 จุด",
+            bgImage: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1200&auto=format&fit=crop",
+            targetRisks: 3,
+            items: [
+                { id: 'm1', name: 'การเชื่อมต่อ Wi-Fi สาธารณะ', x: 35, y: 30, icon: 'bi-wifi-off', isRisk: true, exp: 'ใช้ Free Wi-Fi ที่ไม่มีรหัสผ่านทำธุรกรรม เสี่ยงถูกดักจับข้อมูล (Man-in-the-Middle)' },
+                { id: 'm2', name: 'แจ้งเตือน SMS หลอกลวงแจกเงิน', x: 60, y: 45, icon: 'bi-envelope-exclamation', isRisk: true, exp: 'ระวัง Smishing! ข้อความแนบลิงก์ปลอมหลอกเอาข้อมูลส่วนบุคคล ห้ามกดเด็ดขาด' },
+                { id: 'm3', name: 'แอปพลิเคชันฟังเพลงสตรีมมิ่ง', x: 50, y: 70, icon: 'bi-music-note', isRisk: false, exp: 'แอปฟังเพลงอย่างเป็นทางการ ปลอดภัยและไม่มีความเสี่ยงด้าน Security' },
+                { id: 'm4', name: 'ไม่เปิดระบบยืนยันตัวตน 2 ชั้น (2FA)', x: 75, y: 35, icon: 'bi-shield-slash', isRisk: true, exp: 'บัญชีโซเชียลและอีเมลไม่เปิด 2FA เสี่ยงต่อการถูกแฮกเจาะระบบง่ายดาย' },
+                { id: 'm5', name: 'แอปพลิเคชันสภาพอากาศ', x: 25, y: 50, icon: 'bi-cloud-sun', isRisk: false, exp: 'แอปพยากรณ์อากาศมาตรฐานทั่วไป ปลอดภัยดีไม่มีปัญหา' }
+            ]
+        }
+    ];
+
+    let currentScenarioIndex = 0;
+    let totalScore = 0;
+    let foundRisksCount = 0;
+    const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+
+    function loadScenario() {
+        foundRisksCount = 0;
+        const scenario = scenarios[currentScenarioIndex];
+        
+        document.getElementById('current-scenario-num').innerText = currentScenarioIndex + 1;
+        document.getElementById('scene-title').innerHTML = scenario.title;
+        document.getElementById('scene-desc').innerHTML = scenario.description;
+        
+        // เปลี่ยนภาพพื้นหลังห้องตามสถานการณ์
+        document.getElementById('room-container').style.backgroundImage = `url('${scenario.bgImage}')`;
+
+        // สร้าง Tracker Dots
+        const tracker = document.getElementById('risk-tracker');
+        tracker.innerHTML = "";
+        for(let i=0; i<scenario.targetRisks; i++) {
+            tracker.innerHTML += `<div class="tracker-dot" id="dot-${i}"></div>`;
+        }
+
+        // สร้าง Hotspots บนรูปภาพ
+        const layer = document.getElementById('hotspots-layer');
+        layer.innerHTML = "";
+        
+        scenario.items.forEach(item => {
+            const hotspot = document.createElement('div');
+            hotspot.className = 'hotspot';
+            hotspot.id = `hotspot-${item.id}`;
+            hotspot.style.left = `${item.x}%`;
+            hotspot.style.top = `${item.y}%`;
+            hotspot.innerHTML = `<i class="bi ${item.icon}"></i>`;
+            hotspot.title = item.name;
+            hotspot.onclick = () => inspectItem(item.id, item.isRisk);
+            layer.appendChild(hotspot);
+        });
+    }
+
+    function inspectItem(itemId, isRisk) {
+        const scenario = scenarios[currentScenarioIndex];
+        const itemData = scenario.items.find(i => i.id === itemId);
+        
+        const header = document.getElementById('modal-header');
+        const title = document.getElementById('feedback-title');
+        const desc = document.getElementById('feedback-desc');
+        const icon = document.getElementById('modal-icon');
+        const pin = document.getElementById(`hotspot-${itemId}`);
+
+        if (isRisk) {
+            totalScore += 100;
+            foundRisksCount++;
+            
+            pin.classList.add('checked');
+            pin.innerHTML = `<i class="bi bi-check-lg"></i>`;
+            
+            document.getElementById(`dot-${foundRisksCount-1}`).classList.add('active');
+
+            header.className = "modal-header border-0 bg-success text-white";
+            icon.innerText = "🚨";
+            title.innerText = "ยอดเยี่ยม! พบจุดเสี่ยงความปลอดภัย";
+            title.className = "fw-bold mb-3 text-success";
+            desc.innerHTML = `<b>${itemData.name}:</b> ${itemData.exp}`;
+            
+        } else {
+            totalScore -= 20;
+            
+            header.className = "modal-header border-0 bg-secondary text-white";
+            icon.innerText = "✅";
+            title.innerText = "ตรวจสอบแล้ว... ปลอดภัย!";
+            title.className = "fw-bold mb-3 text-light";
+            desc.innerHTML = `<b>${itemData.name}:</b> ${itemData.exp}`;
+        }
+
+        document.getElementById('score-display').innerText = totalScore;
+        
+        const footerBtns = document.getElementById('modal-footer-btns');
+        if (foundRisksCount >= scenario.targetRisks) {
+            footerBtns.innerHTML = `
+                <button type="button" class="btn btn-primary px-5 py-2 fw-bold w-100" onclick="nextScenario()" style="background: linear-gradient(135deg, #38bdf8, #3b82f6); border:none;">
+                    เคลียร์โซนนี้สำเร็จ! ไปลุยต่อ <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            `;
+        } else {
+            footerBtns.innerHTML = `
+                <button type="button" class="btn btn-outline-light px-4 py-2 w-100" data-bs-dismiss="modal">ค้นหาจุดอื่นต่อ</button>
+            `;
+        }
+
+        modal.show();
+    }
+
+    function nextScenario() {
+        modal.hide();
+        currentScenarioIndex++;
+        if(currentScenarioIndex < scenarios.length) {
+            setTimeout(() => loadScenario(), 400);
+        } else {
+            setTimeout(() => showFinalSummary(), 400);
+        }
+    }
+
+    function showFinalSummary() {
+        const header = document.getElementById('modal-header');
+        const title = document.getElementById('feedback-title');
+        const desc = document.getElementById('feedback-desc');
+        const icon = document.getElementById('modal-icon');
+        const footerBtns = document.getElementById('modal-footer-btns');
+
+        header.className = "modal-header border-0 bg-primary text-white";
+        icon.innerText = "🏆";
+        title.innerText = "ภารกิจตรวจสอบสถานที่สำเร็จสมบูรณ์!";
+        title.className = "fw-bold mb-3 text-info";
+        
+        let rankText = "";
+        if (totalScore >= 800) rankText = "Master Security Inspector (ผู้ตรวจสอบระดับสูงสุด)";
+        else if (totalScore >= 500) rankText = "Senior Privacy Guard (ผู้เชี่ยวชาญความปลอดภัย)";
+        else rankText = "Rookie Watcher (ผู้พิทักษ์ฝึกหัด)";
+
+        desc.innerHTML = `
+            <div class="mb-2">คุณตรวจสอบและค้นหาความเสี่ยง PII ครบทุกสถานที่แล้ว!</div>
+            <div class="display-6 fw-bold text-white mb-2">${totalScore} คะแนน</div>
+            <div class="text-warning fs-5">ระดับของคุณ: <b>${rankText}</b></div>
+            <hr class="border-secondary mt-3 mb-3">
+            <p class="small text-start text-secondary mb-0">การตระหนักรู้เรื่อง Privacy & PII ในชีวิตประจำวันและการทำงาน ช่วยป้องกันข้อมูลส่วนบุคคลรั่วไหลและลดภัยคุกคามทางไซเบอร์ได้อย่างยั่งยืน</p>
+        `;
+
+        footerBtns.innerHTML = `
+            <div class="d-flex gap-3 w-100">
+                <button class="btn btn-outline-light py-2 fw-bold w-50" onclick="restartGame()">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> เล่นอีกครั้ง
+                </button>
+                <a href="security_game.html" class="btn btn-primary py-2 fw-bold w-50" style="background: linear-gradient(135deg, #38bdf8, #3b82f6); border:none;">
+                    <i class="bi bi-house-door-fill me-1"></i> กลับหน้าหลัก
+                </a>
+            </div>
+        `;
+        
+        modal.show();
+    }
+
+    function restartGame() {
+        modal.hide();
+        currentScenarioIndex = 0;
+        totalScore = 0;
+        document.getElementById('score-display').innerText = totalScore;
+        loadScenario();
+    }
+
+    window.onload = loadScenario;
+</script>
+
+</body>
+</html>
